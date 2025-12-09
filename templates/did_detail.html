@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block content %}
+  {% if not simple %}
+    <h1>DID Overview</h1>
+    <div class="summary-bar">
+      <div class="title">{{ rec.company }}</div>
+      <div style="display:flex; align-items:center; gap:8px;">
+        <span class="badge {{ rec.kyc_status }}">{{ rec.kyc_status }}</span>
+        <a href="/did/{{ rec.id }}/download">Download JSON</a>
+        <a href="/did/{{ rec.id }}/bundle">Bundle</a>
+      </div>
+    </div>
+    <div class="card">
+      <div style="display:flex; align-items:center; justify-content: space-between; gap:12px;">
+        <div style="min-width:0;">
+          <div class="small muted">DID</div>
+          <code id="did-id" style="display:inline-block; word-break:break-all; background:#f6f6f6; border:1px solid var(--border); border-radius:6px; padding:6px 8px; color:#000;">{{ rec.did_id }}</code>
+        </div>
+        <button class="copy" type="button" onclick="copyText('{{ rec.did_id }}')">Copy</button>
+      </div>
+    </div>
+  {% endif %}
+
+  <h2 id="did-doc">DID Document</h2>
+  <div class="card">
+    <div class="actions" style="margin-bottom:10px; display:flex; gap:10px; align-items:center;">
+      <a href="/did/{{ rec.id }}/download">Download JSON</a>
+      <button class="copy" type="button" onclick="copyText(document.getElementById('did-doc-json').innerText)">Copy JSON</button>
+    </div>
+    <pre id="did-doc-json">{{ did_doc_pretty }}</pre>
+  </div>
+  <h2 id="credentials">Credentials <a class="nav-link" href="/did/{{ rec.id }}/credentials/new" style="margin-left:8px;">+</a></h2>
+  <div class="card">
+    {% if credentials %}
+      <div>
+        {% for c in credentials %}
+          <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0;{% if not loop.first %} border-top:1px solid var(--border);{% endif %}">
+            <div style="font-weight:700; color:#000;">{{ c.label }}</div>
+            <div style="display:flex; gap:10px; align-items:center;">
+              <span class="badge {% if c.status=='revoked' %}rejected{% else %}approved{% endif %}">{{ c.status }}</span>
+              <a href="/did/{{ rec.id }}/credentials/{{ c.id }}"><button type="button">View</button></a>
+              <a href="/did/{{ rec.id }}/credentials/{{ c.id }}/download"><button class="secondary" type="button">Download</button></a>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="hint">No credentials yet. Create one above.</p>
+    {% endif %}
+  </div>
+
+  {% if not simple %}
+    <h2 id="attestations">Verifier Attestations</h2>
+    <div class="card">
+      {% if attestations_pretty %}
+        {% for a in attestations_pretty %}
+          <pre>{{ a }}</pre>
+        {% endfor %}
+      {% else %}
+        <p class="hint">No attestations yet.</p>
+      {% endif %}
+    </div>
+  {% endif %}
+{% endblock %}

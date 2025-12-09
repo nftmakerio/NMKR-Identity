@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="card" style="padding: 28px;">
+    <div class="timeline">
+      <div class="step">1. Create DID</div>
+      <div class="step active">2. Save Key</div>
+      <div class="step">3. KYC</div>
+      <div class="step">4. Review</div>
+    </div>
+    <h1>Step 2: Save Your Encryption Key</h1>
+    <p class="lead">Download your one‑time key file now and store it securely. You’ll need it to sign credentials and metadata.</p>
+    <div class="callout">
+      <h3>What is this key?</h3>
+      <ul class="list">
+        <li>It decrypts your company DID’s private key for signing.</li>
+        <li>We don’t store the plaintext key; only you control it.</li>
+        <li>You’ll need it later to create Verified Credentials and generate 725 metadata.</li>
+      </ul>
+    </div>
+    <div class="actions" style="display:flex; gap:12px; align-items:center;">
+      <a class="btn-link" href="/did/{{ rec.id }}/download-key"><button>Download Key File</button></a>
+      {% if not has_key %}<span class="hint">If you’ve already downloaded the key, proceed below.</span>{% endif %}
+    </div>
+    <form method="post" action="/wizard/{{ rec.id }}/key/confirm" style="margin-top:16px;">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label style="display:flex; align-items:center; gap:8px;">
+        <input id="confirm" type="checkbox" name="confirmed"> I have downloaded my key and stored it securely.
+      </label>
+      <div class="hint">Keep it in a password manager or safe storage. Do not share it.</div>
+      <div class="actions" style="margin-top:12px;">
+        <button id="continueBtn" type="submit" class="secondary" disabled>Continue to KYC</button>
+      </div>
+    </form>
+  </div>
+  <div class="card" style="padding: 28px; margin-top: 24px;">
+    <h2>Test Your Key</h2>
+    <p>Upload your key file or enter your passphrase to confirm decryption works.</p>
+    <form method="post" action="/did/{{ rec.id }}/key-test" enctype="multipart/form-data">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="hidden" name="next" value="/wizard/{{ rec.id }}/key">
+      <label for="key_file">Key file</label>
+      <input type="file" id="key_file" name="key_file" accept=".txt,.key">
+      <div class="hint">Or enter your passphrase instead:</div>
+      <label for="key_passphrase">Passphrase</label>
+      <input type="password" id="key_passphrase" name="key_passphrase" placeholder="Your encryption passphrase">
+      <div class="actions"><button type="submit">Run Test</button></div>
+    </form>
+  </div>
+  <script>
+    const cb = document.getElementById('confirm');
+    const btn = document.getElementById('continueBtn');
+    function upd(){
+      if (cb && btn){
+        const on = cb.checked;
+        btn.disabled = !on;
+        if (on) { btn.classList.remove('secondary'); }
+        else { if (!btn.classList.contains('secondary')) btn.classList.add('secondary'); }
+      }
+    }
+    if (cb) { cb.addEventListener('change', upd); upd(); }
+  </script>
+{% endblock %}

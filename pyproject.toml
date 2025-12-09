@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "token-identity"
+version = "1.0.0"
+description = "Atala PRISM DID + Cardano Token Identity (RWA) verification standard"
+requires-python = ">=3.10"
+dependencies = [
+  "ecdsa>=0.18.0",
+  "jsonschema>=4.22.0",
+]
+
+[project.scripts]
+token-identity = "token_identity.cli:main"
+

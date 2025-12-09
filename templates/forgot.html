@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>Forgot Password</h1>
+  <form class="card" method="post" action="/forgot">
+    {{ form.hidden_tag() }}
+    <label for="email">Email</label>
+    <input type="text" id="email" name="email" placeholder="you@example.com" required>
+    <div class="actions"><button type="submit">Send reset link</button></div>
+  </form>
+{% endblock %}
+

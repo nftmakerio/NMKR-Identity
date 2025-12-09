@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>Admin: DID Review</h1>
+  <div class="card">
+    <p><strong>Company:</strong> {{ rec.company }}</p>
+    <p><strong>DID:</strong> <span class="hint">{{ rec.did_id }}</span></p>
+    <p><strong>User:</strong> {{ owner.email }} — Verified: {% if owner.email_verified %}Yes{% else %}No{% endif %}</p>
+    <div class="actions">
+      <a href="/admin/did/{{ rec.id }}/docs.zip">Download all documents</a>
+    </div>
+  </div>
+
+  <h2>KYC Documents</h2>
+  <div class="card">
+    {% if documents %}
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        {% for doc in documents %}
+          <div style="border:1px solid #000; padding:10px; background:#fff; color:#000;">
+            <div><strong>{{ doc.filename }}</strong></div>
+            {% set href = '/admin/did/' ~ rec.id ~ '/docs/' ~ doc.id %}
+            {% if doc.filename.lower().endswith(('.png','.jpg','.jpeg','.webp')) %}
+              <img src="{{ href }}" alt="{{ doc.filename }}" style="max-width:100%; background:#fff;">
+            {% elif doc.filename.lower().endswith('.pdf') %}
+              <iframe src="{{ href }}" style="width:100%; height:380px; background:#fff;"></iframe>
+            {% else %}
+              <a href="{{ href }}" target="_blank">Open</a>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="hint">No documents uploaded.</p>
+    {% endif %}
+  </div>
+
+  <h2>Approve</h2>
+  <div class="card">
+    {% if owner.email_verified %}
+      <form method="post" action="/admin/approve/{{ rec.id }}">
+        <label for="notes">Approval notes</label>
+        <textarea id="notes" name="notes" style="width: 100%; height: 80px;"></textarea>
+        <div class="actions"><button type="submit">Approve + Attest</button></div>
+      </form>
+    {% else %}
+      <p class="hint">User must verify email before approval.</p>
+    {% endif %}
+  </div>
+{% endblock %}
+

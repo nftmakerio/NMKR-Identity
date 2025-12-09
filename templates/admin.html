@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>Admin Panel</h1>
+  <p class="hint">Review submissions, approve KYC, and issue the platform’s verifier attestation. Verifier DID: {{ verifier_did }}</p>
+  <div class="callout">
+    <h3>Admin workflow</h3>
+    <ul class="list">
+      <li>Open a submission and preview KYC documents.</li>
+      <li>Ensure the account email is verified before approval.</li>
+      <li>Approve to issue an attestation and VC about the company DID.</li>
+    </ul>
+  </div>
+  <div class="card">
+    <table style="width:100%; border-collapse: collapse;">
+      <tr><th style="text-align:left">Company</th><th style="text-align:left">User</th><th style="text-align:left">Verified</th><th style="text-align:left">DID</th><th style="text-align:left">KYC</th><th style="text-align:left">Attestations</th><th>Action</th></tr>
+      {% for d in dids %}
+      <tr>
+        <td>{{ d.company }}</td>
+        <td>{{ d.owner_email }}</td>
+        <td>{% if d.owner_verified %}Yes{% else %}No{% endif %}</td>
+        <td style="word-break: break-all">{{ d.did_id }}</td>
+        <td><span class="badge {{ d.kyc_status }}">{{ d.kyc_status }}</span></td>
+        <td>{{ d.attestation_count }}</td>
+        <td>
+          <a href="/admin/did/{{ d.id }}">View</a>
+          &nbsp;|&nbsp;
+          {% if d.owner_verified %}
+            <form method="post" action="/admin/approve/{{ d.id }}">
+              <textarea name="notes" placeholder="Approval notes" style="width: 220px; height: 60px;"></textarea>
+              <div class="actions"><button type="submit">Approve + Attest</button></div>
+            </form>
+          {% else %}
+            <div class="hint">User must verify email before approval.</div>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </table>
+  </div>
+{% endblock %}

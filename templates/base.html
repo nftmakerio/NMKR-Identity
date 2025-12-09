@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Token Identity Platform</title>
+    <link rel="icon" type="image/png" sizes="64x64" href="{{ url_for('static', filename='favicon.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon.png') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='favicon.png') }}">
+    <style>
+      :root {
+        /* Light mode with NMKR green accents */
+        --bg: #f6f7fb;         /* page background */
+        --panel: #fff;         /* surfaces */
+        --panel-strong: #fff;  /* light panels/cards */
+        --border: #e3e5e8;     /* light borders */
+        --text: #111;          /* default text on light */
+        --muted: #666;         /* muted text */
+        --accent: #11F250;     /* primary accent (NMKR green) */
+        --success: #11F250;    /* success = accent */
+        --danger: #e11d48;     /* crimson */
+        --warning: #f59e0b;    /* amber */
+      }
+      * { box-sizing: border-box; }
+      body { font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial; margin: 0; padding: 0; background: var(--bg); color: var(--text); }
+      .container { max-width: 1180px; margin: 0 auto; padding: 16px 24px; }
+      /* Headings on light background */
+      h1 { margin: 0 0 12px; font-size: 32px; color: var(--text); }
+      h2 { margin: 22px 0 12px; font-size: 22px; color: var(--text); }
+      p { color: var(--muted); }
+      .card p { color: #000; }
+      /* Inside cards (light background), headings should be dark */
+      .card h1, .card h2, .card h3 { color: #000; }
+      .navbar { display:flex; justify-content: space-between; align-items:center; margin-bottom: 12px; }
+      /* Top navigation */
+      .topnav { background:#fff; border-bottom:1px solid var(--border); border-radius: 0; padding: 8px 16px; box-shadow: none; min-height: 48px; }
+      .topnav .links { display:flex; gap: 8px; align-items:center; margin-left: auto; }
+      .nav-link { color: var(--text); opacity: .9; padding: 0 12px; border-radius: 6px; display:inline-flex; align-items:center; height:36px; }
+      .nav-link:hover { background: rgba(0,0,0,.06); text-decoration: none; }
+      .nav-link.active { background: rgba(0,0,0,.10); }
+      .topnav .actions { display:flex; gap: 10px; align-items:center; }
+      .topnav .actions button { height:36px; padding:0 12px; }
+      .topnav .brand a { display:inline-flex; align-items:center; height:36px; padding: 0 8px; }
+      /* primary variant removed for consistent nav alignment */
+      .brand { font-weight: 800; color: var(--text); letter-spacing: .2px; display:flex; align-items:center; gap:8px; }
+      .brand img.logo { height: 22px; }
+      .nav a { color: var(--text); opacity: .95; }
+
+      /* Square edges, high contrast */
+      .pill { display:inline-block; padding: 6px 10px; border: 1px solid var(--border); background: #fff; color: #000; border-radius: 6px; }
+      .card { background: var(--panel-strong); border: 1px solid var(--border); border-radius: 8px; padding: 28px; color: #000; }
+      label { display: block; margin: 12px 0 6px; color: #000; font-weight: 700; }
+      input[type=text], input[type=password], input[type=email] { width: 100%; padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border); background: #fff; color: #000; }
+      textarea { width: 100%; padding: 10px 12px; border-radius: 6px; border: 1px solid var(--border); background: #fff; color: #000; }
+      .hint { color: #666; font-size: 12px; margin-top: 4px; }
+      .row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+      .actions { margin-top: 16px; }
+      button { background: var(--accent); color: #000; border: 1px solid var(--border); padding: 10px 14px; border-radius: 6px; cursor: pointer; font-weight: 800; transition: transform .05s ease, filter .15s ease; }
+      button:hover { filter: brightness(.96); }
+      button:active { transform: translateY(1px); }
+      button:disabled { background: #e6e6e6; border-color: #b8b8b8; color: #6a6a6a; cursor: not-allowed; filter: none; }
+      button.secondary { background: #fff; color: #000; border: 1px solid var(--border); }
+      button:focus { outline: 2px solid rgba(0,0,0,.15); outline-offset: 2px; }
+      .btn-link { color: var(--accent); }
+      pre { background: #f4f4f4; border: 1px solid var(--border); border-radius: 6px; padding: 12px; overflow: auto; color: #000; }
+      .flash { border-radius: 6px; padding: 12px 14px; margin: 12px 0; background: #111; border: 1px solid #333; color: #fff; }
+      .flash.error { background: #111; border: 1px solid #333; }
+      .flash.info { background: #111; border: 1px solid #333; }
+      .badge { padding: 3px 8px; border-radius: 6px; font-size: 12px; color: #000; border: 1px solid var(--border); background: #eee; }
+      .badge.approved { background: var(--success); }
+      .badge.submitted { background: var(--warning); }
+      .badge.pending { background: var(--warning); }
+      .badge.rejected { background: var(--danger); }
+      .timeline { display:flex; gap: 10px; margin: 12px 0; }
+      .timeline .step { padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border); background: #fff; color: #000; }
+      .timeline .active { background: var(--accent); color:#000; border-color: var(--accent); }
+      .copy { margin-left: 8px; font-size: 12px; background:#fff; color:#000; border:1px solid var(--border); border-radius: 6px; }
+      /* Links: white on dark nav, black inside cards */
+      a { color: var(--accent); text-decoration: none; }
+      .navbar .nav a { color: #fff; }
+      a:hover { text-decoration: underline; }
+
+      /* Explanatory helpers */
+      .callout { background:#f8f8f8; border:1px solid var(--border); padding:12px; margin:12px 0; color:#000; border-radius: 6px; }
+      .callout h3 { margin: 0 0 8px; font-size: 16px; color:#000; }
+      .callout p { margin: 6px 0; color:#000; }
+      .list { margin: 8px 0 0 16px; padding: 0; }
+      .list li { margin: 4px 0; }
+      .lead { font-weight: 700; color:#000; }
+      .small { font-size: 12px; color:#666; }
+
+      /* Visual explainers */
+      .illus { background:#fff; border:1px solid var(--border); padding:12px; margin:12px 0; overflow:auto; border-radius: 6px; }
+      .illus svg { width: 100%; height: auto; display:block; }
+      .icon-row { display:flex; gap:12px; align-items:center; margin: 8px 0; color:#000; }
+      .icon-row svg { width:24px; height:24px; display:inline-block; }
+      .hgroup { display:flex; align-items:center; gap:8px; }
+      .hicon { width:24px; height:24px; display:inline-block; }
+      /* Make heading icons follow current text color for contrast */
+      .hgroup .hicon *, .hgroup .hicon path, .hgroup .hicon rect, .hgroup .hicon circle, .hgroup .hicon line, .hgroup .hicon polyline, .hgroup .hicon polygon {
+        fill: currentColor !important;
+        stroke: currentColor !important;
+      }
+      .illus { margin:16px 0; }
+      /* Layout */
+      .summary-bar { display:flex; justify-content: space-between; align-items:center; background:#fff; color:#000; border:1px solid var(--border); border-radius: 8px; padding:12px 14px; margin: 12px 0; }
+      .summary-bar .title { font-weight: 800; }
+      .chip { display:inline-block; padding: 6px 10px; border:1px solid var(--border); background:#fff; color:#000; margin: 4px 6px 0 0; text-decoration:none; border-radius: 6px; }
+      .pill { border-radius: 6px; }
+      .card-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+      .muted { color:#666; }
+    </style>
+  </head>
+  <body>
+      <div class="navbar topnav">
+        <div class="brand">
+          <a href="/" title="Home" style="display:inline-flex; align-items:center;">
+            <img class="logo" src="{{ url_for('static', filename='nmkr_identity.svg') }}" alt="NMKR">
+          </a>
+        </div>
+        <div class="links">
+          <a class="nav-link {% if request.path.startswith('/dashboard') %}active{% endif %}" href="/dashboard">Dashboard</a>
+          <a class="nav-link {% if request.path.startswith('/about') %}active{% endif %}" href="/about">About</a>
+          {% if current_user.is_authenticated %}
+            <a class="nav-link" href="/wizard/start">Create DID</a>
+            <a class="nav-link {% if request.path.startswith('/settings') %}active{% endif %}" href="/settings">Settings</a>
+            {% if current_user.is_admin %}
+              <a class="nav-link {% if request.path.startswith('/admin') %}active{% endif %}" href="/admin">Admin</a>
+            {% endif %}
+            <a class="nav-link" href="/logout">Logout</a>
+          {% else %}
+            <a class="nav-link {% if request.path.startswith('/login') %}active{% endif %}" href="/login">Login</a>
+            <a class="nav-link {% if request.path.startswith('/register') %}active{% endif %}" href="/register">Register</a>
+          {% endif %}
+        </div>
+      </div>
+    <div class="container">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="flash {{ category }}">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      {% if current_user.is_authenticated and (user_email_verified is defined) and not user_email_verified %}
+        <div class="flash info">
+          Your email is unverified. Please check your inbox for the verification link.
+          <form method="post" action="/resend-verification" style="display:inline; margin-left:10px;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="secondary">Resend verification</button>
+          </form>
+        </div>
+      {% endif %}
+
+      {% block content %}{% endblock %}
+    </div>
+    <div id="modal-overlay" style="display:none; position:fixed; inset:0; background: rgba(0,0,0,.6); align-items:center; justify-content:center;">
+      <div id="modal" class="card" style="max-width:560px; width:92%;">
+        <h2 id="modal-title" style="margin-top:0;">Success</h2>
+        <p id="modal-message"></p>
+        <div class="actions" style="text-align:right;">
+          <button onclick="hideModal()">Close</button>
+        </div>
+      </div>
+    </div>
+    <script>
+      async function copyText(text) {
+        try { await navigator.clipboard.writeText(text); alert('Copied'); } catch(e) { console.log(e); }
+      }
+      function showModal(title, message) {
+        document.getElementById('modal-title').innerText = title || 'Notice';
+        document.getElementById('modal-message').innerText = message || '';
+        const ov = document.getElementById('modal-overlay');
+        ov.style.display = 'flex';
+      }
+      function hideModal() {
+        document.getElementById('modal-overlay').style.display = 'none';
+      }
+    </script>
+  </body>
+  </html>

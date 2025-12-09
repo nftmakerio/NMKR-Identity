@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>About</h1>
+  <div class="card">
+    <h2>What This Platform Does</h2>
+    <p>
+      We help projects prove who they are using Atala PRISM DIDs and Verifiable Credentials (VCs),
+      and we produce on‑chain friendly token metadata ("725") that points to those proofs.
+    </p>
+
+    <h2>End‑to‑End Flow</h2>
+    <ol class="list">
+      <li><strong>Create DID:</strong> You enter company info; we generate a DID Document and an encrypted private key for you to download.</li>
+      <li><strong>Save Key:</strong> Download and store your one‑time key (we never keep your plaintext key).</li>
+      <li><strong>KYC & Review:</strong> Upload documents; an admin reviews and approves.</li>
+      <li><strong>Platform Attestation (VC):</strong> On approval, the platform issues a signed VC attesting to your DID.</li>
+      <li><strong>Create Credentials:</strong> For each asset/project, you create a VC signed by your DID.</li>
+      <li><strong>Token Metadata (725):</strong> Generate signed metadata per credential for on‑chain use.</li>
+    </ol>
+
+    <h2>What Gets Signed</h2>
+    <ul class="list">
+      <li><strong>DID Document:</strong> Self‑signed by your DID key (includes your public JWK).</li>
+      <li><strong>Platform Attestation (VC):</strong> Signed by the platform’s verifier key, referencing your DID.</li>
+      <li><strong>Credential (VC):</strong> Per asset/project, signed by your DID key.</li>
+      <li><strong>Token Metadata (725):</strong> Signed by your DID key; references your DID (and optionally the VC URL).</li>
+    </ul>
+
+    <h2>VC ↔ 725 Metadata (How They Relate)</h2>
+    <ul class="list">
+      <li><strong>Same signer:</strong> Your DID key signs both the VC and the 725 metadata.</li>
+      <li><strong>Cross‑reference:</strong> 725 metadata includes your DID (and a link to the VC); the VC’s <code>issuer</code> is your DID.</li>
+      <li><strong>Verification path:</strong> A verifier checks the DID Document signature, then the VC signature, then the 725 signature — all against the same DID public key.</li>
+      <li><strong>Policy consistency:</strong> Include the policy ID in the VC (credentialSubject.policyID) and mirror it in 725 to scope the claim to one policy.</li>
+    </ul>
+
+    <h2>How Others Verify</h2>
+    <ol class="list">
+      <li><strong>Start at the VC:</strong> Read <code>issuer</code> (your DID).</li>
+      <li><strong>Get DID + Attestations:</strong> Use our public DID endpoint or the bundle you share.</li>
+      <li><strong>Check Signatures:</strong>
+        <ul class="list">
+          <li>DID Document → verify signature with public JWK inside the DID.</li>
+          <li>VC → verify signature with the DID public key.</li>
+          <li>Platform Attestation VC → verify signature with the platform’s public key.</li>
+          <li>Token Metadata (optional) → verify signature with the DID public key.</li>
+        </ul>
+      </li>
+      <li><strong>Check Status:</strong> Call the credential’s status URL to confirm active/revoked.</li>
+    </ol>
+    <p class="small">Tip: On the credential page, “Verify” reproduces these exact steps and shows pass/fail per step.</p>
+
+    <h2>Public Endpoints</h2>
+    <ul class="list">
+      <li><code>GET https://identity.nmkr.io/api/credentials/&lt;id&gt;</code> — Public VC JSON</li>
+      <li><code>GET https://identity.nmkr.io/api/credentials/&lt;id&gt;/status</code> — <em>SimpleStatus</em> (active/revoked)</li>
+      <li><code>GET https://identity.nmkr.io/api/dids/&lt;id&gt;/public</code> — DID Document + platform attestations</li>
+    </ul>
+
+    <h2>How the App Is Organized</h2>
+    <ul class="list">
+      <li><strong>DIDs page:</strong> Each DID is a parent; credentials live under it. Use “+” to add a credential.</li>
+      <li><strong>DID Overview:</strong> Shows the DID, pretty‑printed DID Document JSON, and platform attestations.</li>
+      <li><strong>Credential Detail:</strong> Shows the VC, “Verify” (full third‑party verification), and “Download VC”.</li>
+    </ul>
+
+    <h2>Standards & Choices</h2>
+    <ul class="list">
+      <li><strong>issuer is a DID:</strong> We keep issuer as a DID for VCs; keys come from the DID Document.</li>
+      <li><strong>Attestations as VCs:</strong> Platform endorsements are standard VCs signed by the platform’s DID.</li>
+      <li><strong>Crypto:</strong> secp256k1 + deterministic ECDSA; canonical JSON (sorted keys) for signature stability.</li>
+      <li><strong>725 Metadata:</strong> Includes the DID and can include a VC URL via <code>files</code>.</li>
+    </ul>
+
+    <p class="hint">No blockchain writes happen here; you decide when/where to publish metadata.</p>
+  </div>
+{% endblock %}

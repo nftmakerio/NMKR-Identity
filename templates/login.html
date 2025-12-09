@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>Login</h1>
+  <p>Welcome back. Log in to manage your company DID, create credentials, and generate metadata.</p>
+  <form class="card" method="post" action="/login">
+    {{ form.hidden_tag() }}
+    <label for="email">Email</label>
+    <input type="email" id="email" name="email" value="{{ form.email.data or '' }}" placeholder="you@example.com" required>
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password" placeholder="••••••••" required>
+    <div class="actions"><button type="submit">Login</button></div>
+    <div class="hint" style="margin-top:8px;">
+      <a href="/forgot">Forgot password?</a>
+    </div>
+  </form>
+{% endblock %}

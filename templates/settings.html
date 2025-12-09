@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>Settings</h1>
+  <div class="card">
+    <p><strong>API Token:</strong> {% if has_token %}Exists{% else %}Not set{% endif %}</p>
+    <form method="post" action="/settings/token">
+      <div class="actions"><button type="submit">Generate/Regenerate</button></div>
+    </form>
+    {% if has_token %}
+    <form method="post" action="/settings/token/revoke" style="margin-top:10px;">
+      <div class="actions"><button type="submit">Revoke</button></div>
+    </form>
+    {% endif %}
+  </div>
+{% endblock %}
+

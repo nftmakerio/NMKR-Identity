@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="card" style="padding: 28px;">
+    <div class="timeline">
+      <div class="step">1. Create DID</div>
+      <div class="step">2. Save Key</div>
+      <div class="step active">3. KYC</div>
+      <div class="step">4. Review</div>
+    </div>
+    {% if has_key %}
+    <div class="flash info" style="margin-top:0;">
+      Your encryption key has been generated. Please <a href="/did/{{ rec.id }}/download-key">download it now</a> and store it safely. You will need it to sign metadata.
+      <form method="post" action="/did/{{ rec.id }}/key-confirm" style="display:inline; margin-left:8px;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="secondary">I saved my key</button>
+      </form>
+    </div>
+    {% endif %}
+    <h1>Step 3: Upload KYC Documents</h1>
+    <p>Upload at least one document to help us verify your project. Examples: company registration, ID of authorized signatory.</p>
+    <div class="callout">
+      <h3>Tips for a smooth review</h3>
+      <ul class="list">
+        <li>Upload clear, legible copies (PDF or images).</li>
+        <li>Include any registration documents and an ID for an authorized signatory.</li>
+        <li>You can come back later — your progress is saved.</li>
+      </ul>
+    </div>
+    
+    <form method="post" action="{{ upload_action }}" enctype="multipart/form-data">
+      <label for="files">Select files</label>
+      <div id="dropzone" style="border:1px dashed #000; padding:12px; background:#fafafa; color:#000;">
+        Drag & drop files here or click to select
+        <input type="file" id="files" name="files" accept=".pdf,.png,.jpg,.jpeg,.webp" multiple style="display:none;">
+      </div>
+      <div class="hint">Allowed: PDF, PNG, JPG, JPEG, WEBP. Max size {{ (config.MAX_CONTENT_LENGTH // (1024*1024)) if config.MAX_CONTENT_LENGTH else 25 }} MB each.</div>
+      <input type="hidden" name="next" value="{{ request.path }}">
+      <div class="actions"><button type="submit">Upload</button></div>
+    </form>
+    <h2>Uploaded</h2>
+    {% if documents %}
+      <ul>
+      {% for doc in documents %}
+        <li>{{ doc.filename }}</li>
+      {% endfor %}
+      </ul>
+    {% else %}
+      <p class="hint">No documents yet.</p>
+    {% endif %}
+    <div class="actions" style="margin-top:16px; display:flex; gap:12px;">
+      <form method="post" action="/wizard/{{ rec.id }}/submit">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit">Submit for Review</button>
+      </form>
+      <a class="btn-link" href="/dashboard"><button class="secondary" type="button">Save and return later</button></a>
+    </div>
+  </div>
+  <script>
+    const dz = document.getElementById('dropzone');
+    const input = document.getElementById('files');
+    dz.addEventListener('click', () => input.click());
+    dz.addEventListener('dragover', (e) => { e.preventDefault(); dz.style.background = '#eee'; });
+    dz.addEventListener('dragleave', () => { dz.style.background = '#fafafa'; });
+    dz.addEventListener('drop', (e) => { e.preventDefault(); dz.style.background = '#fafafa'; input.files = e.dataTransfer.files; });
+  </script>
+  
+{% endblock %}

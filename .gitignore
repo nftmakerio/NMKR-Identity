@@ -1,0 +1,21 @@
+__pycache__/
+.pytest_cache/
+.venv/
+dist/
+build/
+*.egg-info/
+*.pyc
+*.pyo
+*.log
+
+
+# Local artifacts
+uploads/
+app.db
+*.sqlite3*
+server.log
+server.pid
+.venv/
+__pycache__/
+*.pyc
+.DS_Store

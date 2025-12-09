@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/token_metadata.schema.json",
+  "title": "Token Identity Metadata (725)",
+  "type": "object",
+  "required": ["725"],
+  "properties": {
+    "725": {
+      "type": "object",
+      "required": ["version"],
+      "properties": {
+        "version": { "type": "string", "const": "1.0" }
+      },
+      "patternProperties": {
+        "^[a-f0-9]+$": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "required": ["type", "files", "@context"],
+            "properties": {
+              "type": { "type": "string", "const": "JsonWebKey2020" },
+              "files": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "type": "object",
+                  "required": ["src", "name", "mediaType"],
+                  "properties": {
+                    "src": { "type": "string", "pattern": "^(did:prism:[a-f0-9]{64}|https?://.+|ipfs://.+)$" },
+                    "name": { "type": "string" },
+                    "mediaType": { "type": "string" }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "@context": { "type": "string" },
+              "proof": {
+                "type": "object",
+                "required": ["type", "created", "verificationMethod", "signatureValue"],
+                "properties": {
+                  "type": { "type": "string", "const": "EcdsaSecp256k1Signature2019" },
+                  "created": { "type": "string" },
+                  "verificationMethod": { "type": "string", "pattern": "^did:prism:[a-f0-9]{64}#master-0$" },
+                  "signatureValue": { "type": "string" }
+                },
+                "additionalProperties": false
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

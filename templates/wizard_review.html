@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="card" style="padding: 28px;">
+    <div class="timeline">
+      <div class="step">1. Create DID</div>
+      <div class="step">2. Save Key</div>
+      <div class="step">3. KYC</div>
+      <div class="step {% if rec.kyc_status in ['submitted','approved','rejected'] %}active{% endif %}">4. Review</div>
+    </div>
+    <h1>Step 4: Review & Approval</h1>
+    <div class="summary-bar">
+      <div class="title">Company DID</div>
+      <div style="display:flex; align-items:center; gap:8px; max-width:100%;">
+        <code style="font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace; font-size: 14px; color: #000; background:#f6f6f6; padding:6px 8px; border:1px solid #000; border-radius:6px; word-break:break-all; display:inline-block;">{{ rec.did_id }}</code>
+        <button class="copy" type="button" onclick="copyText('{{ rec.did_id }}')">Copy</button>
+      </div>
+    </div>
+    <div class="callout">
+      <h3>What happens next?</h3>
+      <ul class="list">
+        <li>Admins review your submission and approve or reject it.</li>
+        <li>On approval, the platform issues a <strong>verifier attestation</strong> for your company DID.</li>
+        <li>Then you can create <strong>Verified Credentials</strong> for assets/projects and generate 725 metadata.</li>
+      </ul>
+    </div>
+    
+    <div class="timeline" style="margin-top:12px;">
+      <div class="step {% if rec.kyc_status in ['submitted','approved','rejected'] %}active{% endif %}">Submitted</div>
+      <div class="step {% if rec.kyc_status=='approved' %}active{% endif %}">Approved</div>
+      <div class="step {% if rec.kyc_status=='rejected' %}active{% endif %}">Rejected</div>
+    </div>
+    <div class="actions" style="display:flex; gap:12px; margin-top:12px;">
+      <a class="btn-link" href="/did/{{ rec.id }}#did-doc"><button class="secondary" type="button">View DID Document</button></a>
+    </div>
+    {% if rec.kyc_status == 'approved' %}
+      <p>Great! Your project is approved. Next, create Verified Credentials (VCs) for your assets/projects from your DID page, then generate 725 metadata per credential.</p>
+      <div class="actions" style="display:flex; gap:12px;">
+        <a class="btn-link" href="/did/{{ rec.id }}?simple=1#credentials"><button type="button">Go to DID & Create Credentials</button></a>
+      </div>
+    {% elif rec.kyc_status == 'rejected' %}
+      <p class="flash error">Your submission was rejected. Reason: {{ rec.kyc_notes or 'N/A' }}</p>
+      <a class="btn-link" href="/did/{{ rec.id }}"><button class="secondary" type="button">View Details</button></a>
+    {% else %}
+      <p>We’re reviewing your submission. You’ll see a green “Approved” badge here once it’s done.</p>
+      <a class="btn-link" href="/dashboard"><button class="secondary" type="button">Back to Dashboard</button></a>
+    {% endif %}
+  </div>
+{% endblock %}

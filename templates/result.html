@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>DID Generated</h1>
+  <div class="card">
+    <p><strong>DID:</strong> {{ did }}</p>
+    <p class="hint">Save this DID. You can also copy the full DID Document below.</p>
+  </div>
+
+  <h2>DID Document</h2>
+  <pre>{{ did_doc_json }}</pre>
+
+  <p><a href="/">Back</a></p>
+{% endblock %}
+

@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="card" style="padding: 28px;">
+    <div class="timeline">
+      <div class="step active">1. Create DID</div>
+      <div class="step">2. Save Key</div>
+      <div class="step">3. KYC</div>
+      <div class="step">4. Review</div>
+    </div>
+    <h1>Step 1: Create Your DID</h1>
+    <p class="small">Enter your company details. We’ll generate a DID and an encrypted key for you to download in the next step.</p>
+    <form method="post" action="/wizard/start">
+      {{ form.hidden_tag() }}
+      <label for="company">Company/Collection Name</label>
+      <input type="text" id="company" name="company" placeholder="Acme, Inc." title="Shown in your DID payload; also used for the DID suffix" required>
+      <div class="hint">Used as your collection name in metadata.</div>
+
+      <div class="row">
+        <div>
+          <label for="website">Website(s)</label>
+          <input type="text" id="website" name="website" placeholder="https://example.com" title="Space-separated for multiple">
+          <div class="hint">Add your main site and any relevant subdomains. Space-separated.</div>
+        </div>
+        <div>
+          <label for="contact_url">Contact URL (optional)</label>
+          <input type="text" id="contact_url" name="contact_url" placeholder="https://example.com/contact">
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="twitter">Twitter handles (optional)</label>
+          <input type="text" id="twitter" name="twitter" placeholder="@acme @acme_support" title="Space-separated; include official accounts for discovery">
+        </div>
+        <div>
+          <label for="discord">Discord IDs (optional)</label>
+          <input type="text" id="discord" name="discord" placeholder="acme#1234" title="Add team members or server IDs as needed">
+        </div>
+      </div>
+
+      <h3>Company Details (optional)</h3>
+      <div class="row">
+        <div>
+          <label for="legal_name">Legal Name</label>
+          <input type="text" id="legal_name" name="legal_name" placeholder="ACME CORPORATION">
+        </div>
+        <div>
+          <label for="industry">Industry</label>
+          <input type="text" id="industry" name="industry" placeholder="Manufacturing">
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label for="country">Country/Region</label>
+          <input type="text" id="country" name="country" placeholder="United States">
+        </div>
+        <div>
+          <label for="registration_number">Registration Number</label>
+          <input type="text" id="registration_number" name="registration_number" placeholder="ABC‑1234567">
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label for="contact_email">Contact Email</label>
+          <input type="email" id="contact_email" name="contact_email" placeholder="hello@example.com">
+        </div>
+        <div>
+          <label for="description">Description</label>
+          <input type="text" id="description" name="description" placeholder="Short description">
+        </div>
+      </div>
+
+      <div class="hint">We will generate a secure key for you. Download and store it safely in the next step.</div>
+      <div class="actions">
+        <button type="submit">Create DID</button>
+      </div>
+    </form>
+  </div>
+{% endblock %}

@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.org/schemas/did_document.schema.json",
+  "title": "Prism DID Document",
+  "type": "object",
+  "required": ["@context", "id", "payload", "verificationMethod", "proof"],
+  "properties": {
+    "@context": {
+      "type": "array",
+      "items": { "type": "string" },
+      "minItems": 1
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^did:prism:[a-f0-9]{64}$"
+    },
+    "payload": {
+      "type": "object",
+      "required": ["date", "accounts", "website"],
+      "properties": {
+        "date": { "type": "string" },
+        "policyID": { "type": "string" },
+        "assetName": { "type": "string" },
+        "accounts": { "type": "object" },
+        "website": { "type": "array", "items": { "type": "string" } },
+        "rwaDetails": {
+          "type": "object",
+          "properties": {
+            "assetType": { "type": "string" },
+            "jurisdiction": { "type": "string" },
+            "registrationNumber": { "type": "string" }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "verificationMethod": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "type", "controller", "publicKeyJwk"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^#master-0$" },
+          "type": { "type": "string", "const": "JsonWebKey2020" },
+          "controller": { "type": "string" },
+          "publicKeyJwk": {
+            "type": "object",
+            "required": ["kty", "crv", "x", "y"],
+            "properties": {
+              "kty": { "type": "string", "const": "EC" },
+              "crv": { "type": "string", "const": "secp256k1" },
+              "x": { "type": "string" },
+              "y": { "type": "string" }
+            },
+            "additionalProperties": false
+          }
+        },
+        "additionalProperties": true
+      }
+    },
+    "proof": {
+      "type": "object",
+      "required": ["type", "created", "verificationMethod", "signatureValue"],
+      "properties": {
+        "type": { "type": "string", "const": "EcdsaSecp256k1Signature2019" },
+        "created": { "type": "string" },
+        "verificationMethod": { "type": "string", "pattern": "^#master-0$" },
+        "signatureValue": { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
