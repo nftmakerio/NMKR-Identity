@@ -143,10 +143,14 @@ def create_app() -> Flask:
                 base = app.config.get("BASE_URL") or request.host_url.rstrip("/")
                 link = f"{base}/verify?token={tok}"
                 sent = _send_email(u.email, "Verify your email", f"Click to verify: {link}")
-                if not sent:
-                    app.logger.info("Verify link for %s: %s", u.email, link)
-            except Exception:
-                pass
+                app.logger.info("Verify link for %s: %s (sent=%s)", u.email, link, bool(sent))
+                if app.debug:
+                    flash(f"Dev verify link: {link}", "info")
+            except Exception as e:
+                try:
+                    app.logger.info("Resend verify: error %s", e)
+                except Exception:
+                    pass
         flash("Verification email sent. Please check your inbox.", "info")
         return redirect(request.referrer or url_for("dashboard"))
 
@@ -290,10 +294,14 @@ def create_app() -> Flask:
                 base = app.config.get("BASE_URL") or request.host_url.rstrip("/")
                 link = f"{base}/verify?token={tok}"
                 sent = _send_email(email, "Verify your email", f"Welcome! Click to verify: {link}")
-                if not sent:
-                    app.logger.info("Verify link for %s: %s", email, link)
-            except Exception:
-                pass
+                app.logger.info("Register verify link for %s: %s (sent=%s)", email, link, bool(sent))
+                if app.debug:
+                    flash(f"Dev verify link: {link}", "info")
+            except Exception as e:
+                try:
+                    app.logger.info("Register verify: error %s", e)
+                except Exception:
+                    pass
             login_user(UserAdapter(u.id, bool(u.is_admin)))
         return redirect(url_for("dashboard"))
 
