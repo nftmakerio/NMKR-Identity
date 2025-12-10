@@ -1,16 +1,18 @@
 {% extends "base.html" %}
 {% block content %}
   <style>
-    .hero { text-align:center; padding: 48px 32px; }
-    .hero .logo { width: 320px; height: auto; display:block; margin: 0 auto 14px; }
-    .hero h1 { margin: 6px 0 8px; font-size: 28px; color:#000; }
-    .hero p { margin: 6px 0 0; color:#444; }
-    .features { display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px; margin-top:18px; }
-    .features .item { background:#fff; border:1px solid var(--border); border-radius:8px; padding:14px; color:#000; }
-    .cta { display:flex; gap:12px; justify-content:center; margin-top:18px; }
+    .hero { text-align:center; padding: 64px 40px; }
+    .hero .logo { width: 320px; height: auto; display:block; margin: 0 auto 20px; }
+    .hero h1 { margin: 8px 0 12px; font-size: 32px; color:#000; }
+    .hero p { margin: 10px 0 0; color:#444; }
+    .features { display:grid; grid-template-columns: 1fr 1fr 1fr; gap:20px; margin-top:28px; }
+    .features .item { background:#fff; border:1px solid var(--border); border-radius:10px; padding:18px; color:#000; }
+    .cta { display:flex; gap:16px; justify-content:center; margin-top:24px; }
     @media (max-width: 720px){
-      .features { grid-template-columns: 1fr; }
-      .hero .logo { width: 200px; height: auto; }
+      .features { grid-template-columns: 1fr; gap:14px; }
+      .hero { padding: 48px 24px; }
+      .hero .logo { width: 220px; height: auto; margin-bottom: 16px; }
+      .hero h1 { font-size: 28px; }
     }
   </style>
   <div class="card hero">
@@ -37,7 +39,7 @@
       </div>
     </div>
   </div>
-  <div class="small muted" style="text-align:center; margin-top:16px; line-height:1.6;">
+  <div class="small muted" style="text-align:center; margin-top:24px; line-height:1.8;">
     utxo AG<br>
     Dammstrasse 16<br>
     6300 Zug<br>
