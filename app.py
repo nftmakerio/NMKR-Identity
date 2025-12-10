@@ -106,53 +106,12 @@ def create_app() -> Flask:
     login_manager.init_app(app)
     limiter = Limiter(get_remote_address, app=app, default_limits=["200 per hour"])  # global limit
 
-    @app.context_processor
-    def inject_user_verification():
-        try:
-            if current_user.is_authenticated:
-                with session_scope(Session) as s:
-                    u = s.get(User, int(current_user.get_id()))
-                    return {"user_email_verified": bool(u.email_verified)}
-        except Exception:
-            pass
-        return {"user_email_verified": True}
-
     # Expose csrf_token() helper to templates for manual forms
     try:
         from flask_wtf.csrf import generate_csrf
         app.jinja_env.globals['csrf_token'] = generate_csrf
     except Exception:
         pass
-
-    # Resend verification link for the current user
-    @app.post("/resend-verification")
-    @login_required
-    @limiter.limit("3 per hour")
-    def resend_verification():
-        with session_scope(Session) as s:
-            u = s.get(User, int(current_user.get_id()))
-            if not u:
-                return redirect(url_for("dashboard"))
-            if u.email_verified:
-                flash("Email already verified.", "info")
-                return redirect(url_for("dashboard"))
-            import secrets
-            tok = secrets.token_urlsafe(24)
-            s.add(EmailToken(user_id=u.id, token=tok, purpose="verify"))
-            try:
-                base = app.config.get("BASE_URL") or request.host_url.rstrip("/")
-                link = f"{base}/verify?token={tok}"
-                sent = _send_email(u.email, "Verify your email", f"Click to verify: {link}")
-                app.logger.info("Verify link for %s: %s (sent=%s)", u.email, link, bool(sent))
-                if app.debug:
-                    flash(f"Dev verify link: {link}", "info")
-            except Exception as e:
-                try:
-                    app.logger.info("Resend verify: error %s", e)
-                except Exception:
-                    pass
-        flash("Verification email sent. Please check your inbox.", "info")
-        return redirect(request.referrer or url_for("dashboard"))
 
     # 413 handler: file too large
     @app.errorhandler(413)
@@ -170,40 +129,6 @@ def create_app() -> Flask:
     # Verifier key (admin signer) setup
     verifier_priv = os.environ.get("VERIFIER_PRIVKEY_HEX")
     app.config["VERIFIER"] = VerifierKey(privkey_hex=verifier_priv, name="PlatformVerifier")
-
-    # AgentMail email sending (optional)
-    def _send_email(to_email: str, subject: str, text: str) -> bool:
-        try:
-            api_key = os.environ.get("AGENTMAIL_API_KEY")
-            if not api_key:
-                return False
-            from agentmail import AgentMail  # type: ignore
-            client = AgentMail(api_key=api_key)
-            inbox = app.config.get("AGENTMAIL_INBOX")
-            if not inbox:
-                try:
-                    inbox = client.inboxes.create()
-                    app.config["AGENTMAIL_INBOX"] = inbox
-                except Exception:
-                    inbox = None
-            inbox_id = None
-            if isinstance(inbox, dict):
-                inbox_id = inbox.get("id") or inbox.get("email") or inbox.get("address") or inbox.get("inbox_id")
-            if not inbox_id:
-                inbox_id = "no-reply@agentmail.to"
-            client.inboxes.messages.send(
-                inbox_id=inbox_id,
-                to=to_email,
-                subject=subject,
-                text=text,
-            )
-            return True
-        except Exception as e:
-            try:
-                app.logger.info("AgentMail send failed: %s", e)
-            except Exception:
-                pass
-            return False
 
     @app.get("/")
     def index():
@@ -323,9 +248,6 @@ def create_app() -> Flask:
             u = s.scalar(select(User).where(User.email == email))
             if not u or not check_password_hash(u.password_hash, password):
                 flash("Invalid credentials", "error")
-                return redirect(url_for("login_page"))
-            if not u.email_verified:
-                flash("Please verify your email (check your inbox for the verification link)", "error")
                 return redirect(url_for("login_page"))
             login_user(UserAdapter(u.id, bool(u.is_admin)))
         return redirect(url_for("dashboard"))
@@ -653,9 +575,6 @@ def create_app() -> Flask:
             if not rec:
                 return "Not found", 404
             owner = s.get(User, rec.user_id)
-            if owner and not owner.email_verified:
-                flash("Cannot approve: owner email is unverified.", "error")
-                return redirect(url_for("admin_panel"))
             from datetime import datetime as _dt
             rec.kyc_status = "approved"
             rec.kyc_notes = notes
