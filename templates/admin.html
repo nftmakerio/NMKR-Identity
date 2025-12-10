@@ -6,7 +6,6 @@
     <h3>Admin workflow</h3>
     <ul class="list">
       <li>Open a submission and preview KYC documents.</li>
-      <li>Ensure the account email is verified before approval.</li>
       <li>Approve to issue an attestation and VC about the company DID.</li>
     </ul>
   </div>
@@ -24,14 +23,10 @@
         <td>
           <a href="/admin/did/{{ d.id }}">View</a>
           &nbsp;|&nbsp;
-          {% if d.owner_verified %}
-            <form method="post" action="/admin/approve/{{ d.id }}">
-              <textarea name="notes" placeholder="Approval notes" style="width: 220px; height: 60px;"></textarea>
-              <div class="actions"><button type="submit">Approve + Attest</button></div>
-            </form>
-          {% else %}
-            <div class="hint">User must verify email before approval.</div>
-          {% endif %}
+          <form method="post" action="/admin/approve/{{ d.id }}">
+            <textarea name="notes" placeholder="Approval notes" style="width: 220px; height: 60px;"></textarea>
+            <div class="actions"><button type="submit">Approve + Attest</button></div>
+          </form>
         </td>
       </tr>
       {% endfor %}

@@ -206,27 +206,9 @@ def create_app() -> Flask:
             if exists:
                 flash("Email already registered", "error")
                 return redirect(url_for("register_page"))
-            u = User(email=email, password_hash=generate_password_hash(password), is_admin=0)
+            u = User(email=email, password_hash=generate_password_hash(password), is_admin=0, email_verified=1)
             s.add(u)
             s.flush()
-            # Dev: emit verify link
-            import secrets
-            tok = secrets.token_urlsafe(24)
-            s.add(EmailToken(user_id=u.id, token=tok, purpose="verify"))
-            # Do not flash here; the persistent unverified banner will inform the user
-            # Log the verify link for developers (no exposure in UI)
-            try:
-                base = app.config.get("BASE_URL") or request.host_url.rstrip("/")
-                link = f"{base}/verify?token={tok}"
-                sent = _send_email(email, "Verify your email", f"Welcome! Click to verify: {link}")
-                app.logger.info("Register verify link for %s: %s (sent=%s)", email, link, bool(sent))
-                if app.debug:
-                    flash(f"Dev verify link: {link}", "info")
-            except Exception as e:
-                try:
-                    app.logger.info("Register verify: error %s", e)
-                except Exception:
-                    pass
             login_user(UserAdapter(u.id, bool(u.is_admin)))
         return redirect(url_for("dashboard"))
 

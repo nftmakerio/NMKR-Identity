@@ -4,7 +4,7 @@
   <div class="card">
     <p><strong>Company:</strong> {{ rec.company }}</p>
     <p><strong>DID:</strong> <span class="hint">{{ rec.did_id }}</span></p>
-    <p><strong>User:</strong> {{ owner.email }} — Verified: {% if owner.email_verified %}Yes{% else %}No{% endif %}</p>
+    <p><strong>User:</strong> {{ owner.email }}</p>
     <div class="actions">
       <a href="/admin/did/{{ rec.id }}/docs.zip">Download all documents</a>
     </div>
@@ -35,15 +35,10 @@
 
   <h2>Approve</h2>
   <div class="card">
-    {% if owner.email_verified %}
-      <form method="post" action="/admin/approve/{{ rec.id }}">
-        <label for="notes">Approval notes</label>
-        <textarea id="notes" name="notes" style="width: 100%; height: 80px;"></textarea>
-        <div class="actions"><button type="submit">Approve + Attest</button></div>
-      </form>
-    {% else %}
-      <p class="hint">User must verify email before approval.</p>
-    {% endif %}
+    <form method="post" action="/admin/approve/{{ rec.id }}">
+      <label for="notes">Approval notes</label>
+      <textarea id="notes" name="notes" style="width: 100%; height: 80px;"></textarea>
+      <div class="actions"><button type="submit">Approve + Attest</button></div>
+    </form>
   </div>
 {% endblock %}
-
