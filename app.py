@@ -32,6 +32,7 @@ import base64
 from ecdsa import VerifyingKey, SECP256k1
 
 from token_identity.models import TokenIdentity
+from dotenv import load_dotenv
 from token_identity.prism_did import PrismDIDManager
 
 
@@ -53,6 +54,11 @@ class UserAdapter(UserMixin):
 
 
 def create_app() -> Flask:
+    # Load local .env if present
+    try:
+        load_dotenv()
+    except Exception:
+        pass
     app = Flask(__name__)
     app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "dev-secret-change-me")
     app.config["UPLOAD_FOLDER"] = os.environ.get("UPLOAD_FOLDER", "uploads")
@@ -134,7 +140,11 @@ def create_app() -> Flask:
             tok = secrets.token_urlsafe(24)
             s.add(EmailToken(user_id=u.id, token=tok, purpose="verify"))
             try:
-                app.logger.info("Verify link for %s: /verify?token=%s", u.email, tok)
+                base = app.config.get("BASE_URL") or request.host_url.rstrip("/")
+                link = f"{base}/verify?token={tok}"
+                sent = _send_email(u.email, "Verify your email", f"Click to verify: {link}")
+                if not sent:
+                    app.logger.info("Verify link for %s: %s", u.email, link)
             except Exception:
                 pass
         flash("Verification email sent. Please check your inbox.", "info")
@@ -156,6 +166,40 @@ def create_app() -> Flask:
     # Verifier key (admin signer) setup
     verifier_priv = os.environ.get("VERIFIER_PRIVKEY_HEX")
     app.config["VERIFIER"] = VerifierKey(privkey_hex=verifier_priv, name="PlatformVerifier")
+
+    # AgentMail email sending (optional)
+    def _send_email(to_email: str, subject: str, text: str) -> bool:
+        try:
+            api_key = os.environ.get("AGENTMAIL_API_KEY")
+            if not api_key:
+                return False
+            from agentmail import AgentMail  # type: ignore
+            client = AgentMail(api_key=api_key)
+            inbox = app.config.get("AGENTMAIL_INBOX")
+            if not inbox:
+                try:
+                    inbox = client.inboxes.create()
+                    app.config["AGENTMAIL_INBOX"] = inbox
+                except Exception:
+                    inbox = None
+            inbox_id = None
+            if isinstance(inbox, dict):
+                inbox_id = inbox.get("id") or inbox.get("email") or inbox.get("address") or inbox.get("inbox_id")
+            if not inbox_id:
+                inbox_id = "no-reply@agentmail.to"
+            client.inboxes.messages.send(
+                inbox_id=inbox_id,
+                to=to_email,
+                subject=subject,
+                text=text,
+            )
+            return True
+        except Exception as e:
+            try:
+                app.logger.info("AgentMail send failed: %s", e)
+            except Exception:
+                pass
+            return False
 
     @app.get("/")
     def index():
@@ -243,7 +287,11 @@ def create_app() -> Flask:
             # Do not flash here; the persistent unverified banner will inform the user
             # Log the verify link for developers (no exposure in UI)
             try:
-                app.logger.info("Verify link for %s: /verify?token=%s", email, tok)
+                base = app.config.get("BASE_URL") or request.host_url.rstrip("/")
+                link = f"{base}/verify?token={tok}"
+                sent = _send_email(email, "Verify your email", f"Welcome! Click to verify: {link}")
+                if not sent:
+                    app.logger.info("Verify link for %s: %s", email, link)
             except Exception:
                 pass
             login_user(UserAdapter(u.id, bool(u.is_admin)))
