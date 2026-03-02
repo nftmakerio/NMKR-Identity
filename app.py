@@ -175,7 +175,7 @@ def create_app() -> Flask:
         form = RegisterForm()
         return render_template("register.html", form=form)
 
-    # Bootstrap default admin
+    # Bootstrap default admin (only creates if missing; never overwrites password)
     with session_scope(Session) as s:
         admin_email = os.environ.get("ADMIN_EMAIL", "patrick@nmkr.io").lower()
         admin_pass = os.environ.get("ADMIN_PASSWORD", "admin")
@@ -184,9 +184,7 @@ def create_app() -> Flask:
             u = User(email=admin_email, password_hash=generate_password_hash(admin_pass), is_admin=1, email_verified=1)
             s.add(u)
         else:
-            # Ensure admin privileges and set the password as requested
             existing.is_admin = 1
-            existing.password_hash = generate_password_hash(admin_pass)
             existing.email_verified = 1
 
     # Backfill existing credentials with vc.id and credentialStatus using BASE_URL
