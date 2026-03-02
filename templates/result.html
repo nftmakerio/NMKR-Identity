@@ -1,14 +1,23 @@
 {% extends "base.html" %}
 {% block content %}
+<div class="page-header">
   <h1>DID Generated</h1>
-  <div class="card">
-    <p><strong>DID:</strong> {{ did }}</p>
-    <p class="hint">Save this DID. You can also copy the full DID Document below.</p>
+</div>
+
+<div class="card">
+  <div>
+    <div class="small muted">Your DID</div>
+    <code style="word-break:break-all; font-size:13px;">{{ did }}</code>
   </div>
+  <p class="hint" style="margin-top:8px;">Save this DID. You can copy the full DID Document below.</p>
+</div>
 
-  <h2>DID Document</h2>
+<h2>DID Document</h2>
+<div class="card">
   <pre>{{ did_doc_json }}</pre>
+</div>
 
-  <p><a href="/">Back</a></p>
+<div class="actions">
+  <a href="/" class="btn-link"><button class="secondary" type="button">Back to Home</button></a>
+</div>
 {% endblock %}
-

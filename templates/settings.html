@@ -1,16 +1,42 @@
 {% extends "base.html" %}
 {% block content %}
+<div class="page-header">
   <h1>Settings</h1>
-  <div class="card">
-    <p><strong>API Token:</strong> {% if has_token %}Exists{% else %}Not set{% endif %}</p>
-    <form method="post" action="/settings/token">
-      <div class="actions"><button type="submit">Generate/Regenerate</button></div>
+  <p>Manage your API token for programmatic access.</p>
+</div>
+
+<div class="card">
+  <h3 style="margin-top:0;">API Token</h3>
+  <p style="font-size:13px;">Use a Bearer token to authenticate with the <code>/api/dids/{id}</code> endpoint.</p>
+
+  <div style="display:flex; align-items:center; gap:12px; margin-top:16px; padding:14px 16px; background:var(--code-bg); border-radius:var(--radius-sm);">
+    <div>
+      <div class="small muted">Status</div>
+      <div style="font-weight:600; font-size:14px; margin-top:2px;">
+        {% if has_token %}
+          <span style="color:#16a34a;">Active</span>
+        {% else %}
+          <span style="color:var(--text-muted);">Not set</span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="actions" style="margin-top:16px;">
+    <form method="post" action="/settings/token" style="display:inline;">
+      <button type="submit">{% if has_token %}Regenerate Token{% else %}Generate Token{% endif %}</button>
     </form>
     {% if has_token %}
-    <form method="post" action="/settings/token/revoke" style="margin-top:10px;">
-      <div class="actions"><button type="submit">Revoke</button></div>
+    <form method="post" action="/settings/token/revoke" style="display:inline;">
+      <button type="submit" class="danger">Revoke Token</button>
     </form>
     {% endif %}
   </div>
-{% endblock %}
 
+  {% if has_token %}
+  <div class="callout" style="margin-top:16px;">
+    <p style="margin:0; font-size:13px;">Tokens are shown only once when generated. If you've lost yours, regenerate a new one.</p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

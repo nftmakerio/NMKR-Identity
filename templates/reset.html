@@ -1,12 +1,16 @@
 {% extends "base.html" %}
 {% block content %}
-  <h1>Reset Password</h1>
+<div class="auth-wrap">
+  <h1>Set New Password</h1>
+  <p>Choose a new password for your account.</p>
   <form class="card" method="post" action="/reset">
     {{ form.hidden_tag() }}
     <input type="hidden" name="token" value="{{ form.token.data }}">
     <label for="new_password">New Password</label>
-    <input type="password" id="new_password" name="new_password" placeholder="••••••••" required>
-    <div class="actions"><button type="submit">Reset</button></div>
+    <input type="password" id="new_password" name="new_password" placeholder="Min. 8 characters" required>
+    <div class="actions" style="justify-content:center;">
+      <button type="submit" style="width:100%;">Reset Password</button>
+    </div>
   </form>
+</div>
 {% endblock %}
-

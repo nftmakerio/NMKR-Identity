@@ -1,11 +1,18 @@
 {% extends "base.html" %}
 {% block content %}
-  <h1>Forgot Password</h1>
+<div class="auth-wrap">
+  <h1>Reset Password</h1>
+  <p>Enter your email and we'll send a reset link.</p>
   <form class="card" method="post" action="/forgot">
     {{ form.hidden_tag() }}
     <label for="email">Email</label>
-    <input type="text" id="email" name="email" placeholder="you@example.com" required>
-    <div class="actions"><button type="submit">Send reset link</button></div>
+    <input type="email" id="email" name="email" placeholder="you@example.com" required>
+    <div class="actions" style="justify-content:center;">
+      <button type="submit" style="width:100%;">Send Reset Link</button>
+    </div>
+    <p style="text-align:center; margin-top:12px; font-size:13px;">
+      <a href="/login" style="color:var(--text-muted);">Back to login</a>
+    </p>
   </form>
+</div>
 {% endblock %}
-

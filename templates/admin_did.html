@@ -1,44 +1,59 @@
 {% extends "base.html" %}
 {% block content %}
-  <h1>Admin: DID Review</h1>
-  <div class="card">
-    <p><strong>Company:</strong> {{ rec.company }}</p>
-    <p><strong>DID:</strong> <span class="hint">{{ rec.did_id }}</span></p>
-    <p><strong>User:</strong> {{ owner.email }}</p>
-    <div class="actions">
-      <a href="/admin/did/{{ rec.id }}/docs.zip">Download all documents</a>
+<style>
+  .doc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .doc-card { border: 1px solid var(--border); border-radius: var(--radius-sm); overflow: hidden; background: var(--surface); }
+  .doc-card .doc-name { padding: 10px 14px; font-size: 13px; font-weight: 600; border-bottom: 1px solid var(--border-subtle); background: var(--code-bg); }
+  .doc-card img { width: 100%; display: block; }
+  .doc-card iframe { width: 100%; height: 380px; display: block; border: none; }
+  @media (max-width: 720px) { .doc-grid { grid-template-columns: 1fr; } }
+</style>
+
+<div class="page-header">
+  <h1>DID Review</h1>
+  <p>{{ rec.company }} &mdash; {{ owner.email }}</p>
+</div>
+
+<div class="card">
+  <div style="display:flex; flex-direction:column; gap:8px;">
+    <div><span class="small muted">DID</span></div>
+    <code style="font-size:12px; word-break:break-all;">{{ rec.did_id }}</code>
+    <div style="margin-top:4px;">
+      <span class="badge {{ rec.kyc_status }}">{{ rec.kyc_status }}</span>
     </div>
   </div>
+  <div class="actions">
+    <a href="/admin/did/{{ rec.id }}/docs.zip"><button class="secondary" type="button">Download All Documents</button></a>
+  </div>
+</div>
 
-  <h2>KYC Documents</h2>
-  <div class="card">
-    {% if documents %}
-      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-        {% for doc in documents %}
-          <div style="border:1px solid #000; padding:10px; background:#fff; color:#000;">
-            <div><strong>{{ doc.filename }}</strong></div>
-            {% set href = '/admin/did/' ~ rec.id ~ '/docs/' ~ doc.id %}
-            {% if doc.filename.lower().endswith(('.png','.jpg','.jpeg','.webp')) %}
-              <img src="{{ href }}" alt="{{ doc.filename }}" style="max-width:100%; background:#fff;">
-            {% elif doc.filename.lower().endswith('.pdf') %}
-              <iframe src="{{ href }}" style="width:100%; height:380px; background:#fff;"></iframe>
-            {% else %}
-              <a href="{{ href }}" target="_blank">Open</a>
-            {% endif %}
-          </div>
-        {% endfor %}
+<h2>KYC Documents</h2>
+{% if documents %}
+  <div class="doc-grid">
+    {% for doc in documents %}
+      <div class="doc-card">
+        <div class="doc-name">{{ doc.filename }}</div>
+        {% set href = '/admin/did/' ~ rec.id ~ '/docs/' ~ doc.id %}
+        {% if doc.filename.lower().endswith(('.png','.jpg','.jpeg','.webp')) %}
+          <img src="{{ href }}" alt="{{ doc.filename }}">
+        {% elif doc.filename.lower().endswith('.pdf') %}
+          <iframe src="{{ href }}"></iframe>
+        {% else %}
+          <div style="padding:16px;"><a href="{{ href }}" target="_blank" style="font-weight:600;">Open file</a></div>
+        {% endif %}
       </div>
-    {% else %}
-      <p class="hint">No documents uploaded.</p>
-    {% endif %}
+    {% endfor %}
   </div>
+{% else %}
+  <div class="card"><p class="hint" style="margin:0;">No documents uploaded.</p></div>
+{% endif %}
 
-  <h2>Approve</h2>
-  <div class="card">
-    <form method="post" action="/admin/approve/{{ rec.id }}">
-      <label for="notes">Approval notes</label>
-      <textarea id="notes" name="notes" style="width: 100%; height: 80px;"></textarea>
-      <div class="actions"><button type="submit">Approve + Attest</button></div>
-    </form>
-  </div>
+<h2>Approve</h2>
+<div class="card">
+  <form method="post" action="/admin/approve/{{ rec.id }}">
+    <label for="notes">Approval Notes</label>
+    <textarea id="notes" name="notes" rows="3" placeholder="Optional notes about the approval decision"></textarea>
+    <div class="actions"><button type="submit">Approve & Issue Attestation</button></div>
+  </form>
+</div>
 {% endblock %}

@@ -1,68 +1,65 @@
 {% extends "base.html" %}
 {% block content %}
 <style>
-  .docs-hero { text-align:center; padding: 48px 32px 36px; }
-  .docs-hero h1 { font-size: 36px; margin: 0 0 8px; }
-  .docs-hero p { color: #444; font-size: 16px; max-width: 640px; margin: 0 auto; }
+  .docs-hero { text-align: center; padding: 48px 32px 36px; }
+  .docs-hero h1 { font-size: 36px; letter-spacing: -0.03em; margin: 0 0 8px; }
+  .docs-hero p { font-size: 16px; max-width: 600px; margin: 0 auto; }
 
-  .docs-nav { display:flex; flex-wrap:wrap; gap: 8px; justify-content:center; margin: 0 0 28px; }
-  .docs-nav a { display:inline-block; padding: 8px 14px; border:1px solid var(--border); border-radius: 6px; background:#fff; color:#111; font-size: 13px; font-weight: 600; transition: all .1s; }
-  .docs-nav a:hover { background: var(--accent); text-decoration:none; border-color: var(--accent); }
+  .docs-nav { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin: 0 0 28px; }
+  .docs-nav a {
+    display: inline-block; padding: 7px 14px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+    background: var(--surface); color: var(--text); font-size: 13px; font-weight: 500; transition: all .15s;
+  }
+  .docs-nav a:hover { background: var(--accent-soft); border-color: rgba(17,242,80,.3); text-decoration: none; }
 
-  .doc-section { margin-bottom: 36px; }
-  .doc-section h2 { font-size: 24px; margin: 0 0 16px; padding-top: 24px; border-top: 1px solid var(--border); }
+  .doc-section { margin-bottom: 32px; }
+  .doc-section h2 { font-size: 24px; margin: 0 0 16px; padding-top: 24px; border-top: 1px solid var(--border-subtle); }
   .doc-section:first-of-type h2 { border-top: none; padding-top: 0; }
-  .doc-section h3 { font-size: 18px; margin: 20px 0 10px; }
-  .doc-section p { color: #333; line-height: 1.7; margin: 8px 0; }
-  .doc-section ul, .doc-section ol { margin: 8px 0 8px 20px; padding: 0; }
-  .doc-section li { margin: 6px 0; color: #333; line-height: 1.6; }
+  .doc-section h3 { font-size: 17px; margin: 20px 0 10px; }
+  .doc-section p { line-height: 1.7; margin: 8px 0; }
+  .doc-section ul, .doc-section ol { margin: 8px 0 8px 20px; }
+  .doc-section li { margin: 6px 0; line-height: 1.6; }
 
-  .concept-grid { display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin: 16px 0; }
-  .concept-card { background:#fff; border:1px solid var(--border); border-radius: 8px; padding: 20px; }
-  .concept-card h4 { margin: 0 0 8px; font-size: 16px; }
-  .concept-card p { color: #555; font-size: 14px; margin: 0; line-height: 1.6; }
-  .concept-card .tag { display:inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; margin-bottom: 8px; }
-  .concept-card .tag.core { background: #e8fbe8; color: #1a7a1a; }
-  .concept-card .tag.chain { background: #e8f0fb; color: #1a4a7a; }
-  .concept-card .tag.proof { background: #fbe8f0; color: #7a1a4a; }
+  .concept-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; margin: 16px 0; }
+  .concept-card { padding: 20px; }
+  .concept-card h4 { margin: 0 0 6px; font-size: 15px; }
+  .concept-card p { font-size: 13px; margin: 0; line-height: 1.6; }
+  .concept-tag { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; margin-bottom: 8px; }
+  .concept-tag.core { background: var(--success-soft); color: #16a34a; }
+  .concept-tag.chain { background: rgba(59,130,246,.1); color: #2563eb; }
+  .concept-tag.proof { background: rgba(168,85,247,.1); color: #7c3aed; }
 
-  .flow-steps { display:flex; flex-direction:column; gap: 0; margin: 20px 0; }
-  .flow-step { display:flex; gap: 16px; align-items:flex-start; position:relative; padding: 16px 0; }
-  .flow-step:not(:last-child)::after { content:''; position:absolute; left:19px; top:48px; bottom:0; width:2px; background:var(--border); }
-  .flow-num { width:40px; height:40px; border-radius: 50%; background:var(--accent); color:#000; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:16px; flex-shrink:0; position:relative; z-index:1; }
-  .flow-body { flex:1; }
+  .flow-steps { display: flex; flex-direction: column; margin: 20px 0; }
+  .flow-step { display: flex; gap: 16px; align-items: flex-start; position: relative; padding: 16px 0; }
+  .flow-step:not(:last-child)::after { content: ''; position: absolute; left: 19px; top: 52px; bottom: 0; width: 2px; background: var(--border-subtle); }
+  .flow-num { width: 40px; height: 40px; border-radius: 50%; background: var(--text); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 15px; flex-shrink: 0; position: relative; z-index: 1; }
+  .flow-body { flex: 1; }
   .flow-body h4 { margin: 0 0 4px; font-size: 15px; }
-  .flow-body p { margin: 0; color: #555; font-size: 14px; line-height: 1.5; }
+  .flow-body p { margin: 0; font-size: 14px; line-height: 1.6; }
 
-  .api-endpoint { background:#fff; border:1px solid var(--border); border-radius: 8px; margin: 12px 0; overflow:hidden; }
-  .api-header { display:flex; align-items:center; gap: 10px; padding: 12px 16px; border-bottom:1px solid var(--border); cursor:pointer; }
-  .api-header:hover { background: #fafafa; }
-  .api-method { padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: 800; font-family: monospace; }
-  .api-method.get { background: #e8f5e9; color: #2e7d32; }
-  .api-path { font-family: monospace; font-size: 14px; color: #111; }
-  .api-desc { color: #666; font-size: 13px; margin-left: auto; }
-  .api-body { padding: 16px; display:none; border-top: 1px solid var(--border); background: #fafbfc; }
-  .api-body.open { display:block; }
-  .api-body p { font-size: 14px; color: #333; }
-  .api-body pre { font-size: 13px; background: #f0f0f0; margin: 8px 0; }
+  .api-endpoint { border: 1px solid var(--border); border-radius: var(--radius-sm); margin: 10px 0; overflow: hidden; }
+  .api-header { display: flex; align-items: center; gap: 10px; padding: 12px 16px; cursor: pointer; transition: background .1s; }
+  .api-header:hover { background: var(--code-bg); }
+  .api-method { padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 700; font-family: var(--font-mono); }
+  .api-method.get { background: var(--success-soft); color: #16a34a; }
+  .api-path { font-family: var(--font-mono); font-size: 13px; color: var(--text); }
+  .api-desc { color: var(--text-muted); font-size: 13px; margin-left: auto; }
+  .api-body { padding: 16px; display: none; border-top: 1px solid var(--border-subtle); background: var(--code-bg); }
+  .api-body.open { display: block; }
+  .api-body p { font-size: 14px; }
 
-  .verify-chain { display:flex; flex-wrap:wrap; gap: 12px; align-items:center; justify-content:center; margin: 20px 0; padding: 24px; background: #fff; border: 1px solid var(--border); border-radius: 8px; }
-  .chain-item { text-align:center; padding: 12px 16px; border:1px solid var(--border); border-radius: 8px; background: #fafbfc; min-width: 140px; }
-  .chain-item .label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: .5px; }
-  .chain-item .value { font-size: 14px; font-weight: 700; margin-top: 4px; }
-  .chain-arrow { font-size: 20px; color: #999; }
+  .verify-chain { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: center; margin: 20px 0; padding: 24px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+  .chain-item { text-align: center; padding: 12px 16px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--code-bg); min-width: 130px; }
+  .chain-item .chain-label { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .05em; }
+  .chain-item .chain-value { font-size: 14px; font-weight: 600; margin-top: 4px; }
+  .chain-arrow { font-size: 18px; color: var(--text-muted); }
 
-  .info-box { background: #f8faf8; border: 1px solid #d4e8d4; border-radius: 8px; padding: 16px 20px; margin: 16px 0; }
-  .info-box p { margin: 0; color: #2a5a2a; font-size: 14px; }
-  .warn-box { background: #fffbf0; border: 1px solid #e8dcc0; border-radius: 8px; padding: 16px 20px; margin: 16px 0; }
-  .warn-box p { margin: 0; color: #6a5a2a; font-size: 14px; }
+  .info-box { background: var(--success-soft); border: 1px solid rgba(34,197,94,.2); border-radius: var(--radius-sm); padding: 14px 18px; margin: 16px 0; }
+  .info-box p { margin: 0; font-size: 14px; color: var(--text); }
+  .warn-box { background: var(--warning-soft); border: 1px solid rgba(245,158,11,.2); border-radius: var(--radius-sm); padding: 14px 18px; margin: 16px 0; }
+  .warn-box p { margin: 0; font-size: 14px; color: var(--text); }
 
-  .code-inline { background: #f0f0f0; padding: 2px 6px; border-radius: 3px; font-family: monospace; font-size: 13px; }
-  .table-wrap { overflow-x:auto; margin: 12px 0; }
-  .table-wrap table { width:100%; border-collapse:collapse; font-size: 14px; }
-  .table-wrap th { text-align:left; padding: 10px 12px; border-bottom: 2px solid var(--border); font-weight: 700; color: #333; }
-  .table-wrap td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: #444; }
-  .table-wrap tr:last-child td { border-bottom: none; }
+  .table-wrap { overflow-x: auto; margin: 12px 0; }
 
   @media (max-width: 720px) {
     .docs-hero { padding: 32px 16px 24px; }
@@ -71,7 +68,7 @@
     .verify-chain { flex-direction: column; }
     .chain-arrow { transform: rotate(90deg); }
     .api-header { flex-wrap: wrap; }
-    .api-desc { margin-left: 0; margin-top: 4px; }
+    .api-desc { margin-left: 0; }
   }
 </style>
 
@@ -96,22 +93,22 @@
   <h2>Overview</h2>
   <p>
     NMKR Identity is a platform for Cardano NFT projects and real-world asset (RWA) issuers to establish
-    <strong>cryptographically verifiable identity</strong>. Instead of relying on screenshots, social media posts,
-    or trust, projects prove who they are using open standards: <strong>Atala PRISM DIDs</strong> and
+    <strong>cryptographically verifiable identity</strong>. Instead of relying on screenshots or social media,
+    projects prove who they are using open standards: <strong>Atala PRISM DIDs</strong> and
     <strong>W3C Verifiable Credentials</strong>.
   </p>
   <p>
-    The platform produces signed <strong>Cardano 725 metadata</strong> that can be submitted on-chain,
+    The platform produces signed <strong>Cardano 725 metadata</strong> for on-chain submission,
     linking your token policy to a verified identity. Any third party can independently verify
     the entire chain of trust without contacting us.
   </p>
 
   <h3>What problems does this solve?</h3>
-  <ul>
-    <li><strong>Project impersonation</strong> &mdash; Anyone can claim to be behind a Cardano policy. DIDs provide cryptographic proof of identity.</li>
-    <li><strong>Unverifiable claims</strong> &mdash; Social media links and screenshots can be faked. Verifiable Credentials are signed and tamper-evident.</li>
-    <li><strong>No on-chain identity link</strong> &mdash; 725 metadata embeds your DID and credential URLs directly in token metadata, readable by wallets and marketplaces.</li>
-    <li><strong>RWA compliance</strong> &mdash; Real-world asset projects can attach jurisdiction, registration numbers, and asset types to their credentials.</li>
+  <ul class="list">
+    <li><strong>Project impersonation</strong> &mdash; DIDs provide cryptographic proof of identity tied to a keypair you control.</li>
+    <li><strong>Unverifiable claims</strong> &mdash; Verifiable Credentials are signed and tamper-evident, unlike screenshots.</li>
+    <li><strong>No on-chain identity link</strong> &mdash; 725 metadata embeds your DID and credential URLs directly in token metadata.</li>
+    <li><strong>RWA compliance</strong> &mdash; Attach jurisdiction, registration numbers, and asset types to credentials.</li>
   </ul>
 </div>
 
@@ -121,39 +118,25 @@
   <p>Four building blocks make up the identity and verification system.</p>
 
   <div class="concept-grid">
-    <div class="concept-card">
-      <span class="tag core">Identity</span>
+    <div class="card concept-card">
+      <span class="concept-tag core">Identity</span>
       <h4>DID (Decentralized Identifier)</h4>
-      <p>
-        A globally unique identifier (<span class="code-inline">did:prism:abc123...</span>) tied to a cryptographic keypair you control.
-        The DID Document contains your public key, company info, social accounts, and website &mdash; all self-signed.
-        No central authority can revoke or modify your DID.
-      </p>
+      <p>A globally unique identifier (<code>did:prism:abc...</code>) tied to a cryptographic keypair you control. The DID Document contains your public key, company info, social accounts, and website &mdash; all self-signed.</p>
     </div>
-    <div class="concept-card">
-      <span class="tag proof">Credential</span>
+    <div class="card concept-card">
+      <span class="concept-tag proof">Credential</span>
       <h4>Verifiable Credential (VC)</h4>
-      <p>
-        A W3C-standard JSON document asserting facts about your project (policy ID, asset name, RWA details).
-        Signed by your DID key, it can be verified by anyone with access to your DID Document.
-        Each credential has a public URL and a status endpoint (active/revoked).
-      </p>
+      <p>A W3C-standard JSON document asserting facts about your project (policy ID, asset name, RWA details). Signed by your DID key, verifiable by anyone with access to your DID Document.</p>
     </div>
-    <div class="concept-card">
-      <span class="tag chain">On-Chain</span>
+    <div class="card concept-card">
+      <span class="concept-tag chain">On-Chain</span>
       <h4>725 Token Metadata</h4>
-      <p>
-        Cardano's CIP-725 standard for on-chain identity metadata. The metadata contains references to your DID and
-        credential URLs, all signed by your DID key. Wallets and marketplaces can read this directly from the chain.
-      </p>
+      <p>CIP-725 standard for on-chain identity metadata. Contains references to your DID and credential URLs, signed by your DID key. Wallets and marketplaces read this directly from the chain.</p>
     </div>
-    <div class="concept-card">
-      <span class="tag proof">Trust</span>
+    <div class="card concept-card">
+      <span class="concept-tag proof">Trust</span>
       <h4>Platform Attestation</h4>
-      <p>
-        After KYC review, the platform issues its own signed VC attesting to your DID. This adds a second layer of trust:
-        your DID is self-signed, and the platform independently vouches for you. Verifiers check both signatures.
-      </p>
+      <p>After KYC review, the platform issues its own signed VC attesting to your DID. Adds a second trust layer: your DID is self-signed, and the platform independently vouches for you.</p>
     </div>
   </div>
 </div>
@@ -168,51 +151,42 @@
       <div class="flow-num">1</div>
       <div class="flow-body">
         <h4>Create Your DID</h4>
-        <p>Enter your company name, website, and social accounts. The platform generates a DID Document with a fresh
-        secp256k1 keypair. Your DID identifier is derived from a SHA-256 hash of your company name.</p>
+        <p>Enter your company name, website, and social accounts. The platform generates a DID Document with a fresh secp256k1 keypair. Your DID identifier is derived from SHA-256 of your company name.</p>
       </div>
     </div>
     <div class="flow-step">
       <div class="flow-num">2</div>
       <div class="flow-body">
-        <h4>Download &amp; Save Your Key</h4>
-        <p>Your private key is encrypted with a server-generated passphrase (PBKDF2 + Fernet, 200k iterations).
-        Download the key file immediately &mdash; it is shown only once and never stored in plaintext.
-        You will need this key to sign credentials and metadata later.</p>
+        <h4>Download & Save Your Key</h4>
+        <p>Your private key is encrypted with a server-generated passphrase (PBKDF2 + Fernet, 200k iterations). Download it immediately &mdash; shown only once. You need this to sign credentials and metadata.</p>
       </div>
     </div>
     <div class="flow-step">
       <div class="flow-num">3</div>
       <div class="flow-body">
         <h4>Upload KYC Documents</h4>
-        <p>Upload company registration documents, proof of identity, or other supporting files (PDF, PNG, JPG, WEBP).
-        These are reviewed by an administrator and are never shared publicly.</p>
+        <p>Upload company registration, proof of identity, or supporting files. These are reviewed by an admin and never shared publicly.</p>
       </div>
     </div>
     <div class="flow-step">
       <div class="flow-num">4</div>
       <div class="flow-body">
-        <h4>Admin Review &amp; Attestation</h4>
-        <p>An administrator reviews your documents. Upon approval, the platform automatically issues a signed
-        Verifiable Credential (platform attestation) that references your DID. This VC is stored alongside your DID.</p>
+        <h4>Admin Review & Attestation</h4>
+        <p>An admin reviews your documents. Upon approval, the platform automatically issues a signed Verifiable Credential (platform attestation) referencing your DID.</p>
       </div>
     </div>
     <div class="flow-step">
       <div class="flow-num">5</div>
       <div class="flow-body">
         <h4>Issue Credentials</h4>
-        <p>For each Cardano policy or asset, create a Verifiable Credential signed by your DID key.
-        Credentials include the policy ID, asset name, optional RWA details, and a public status URL.
-        Each credential gets a unique public URL and QR code for easy sharing.</p>
+        <p>For each Cardano policy or asset, create a VC signed by your DID key. Each credential gets a unique public URL and QR code.</p>
       </div>
     </div>
     <div class="flow-step">
       <div class="flow-num">6</div>
       <div class="flow-body">
         <h4>Generate 725 Metadata</h4>
-        <p>Generate CIP-725 compliant metadata for any credential. The metadata references your DID and credential URL
-        in its <span class="code-inline">files</span> array, all signed by your DID key. Submit this metadata on-chain
-        alongside your token transaction.</p>
+        <p>Generate CIP-725 metadata for any credential. It references your DID and credential URL, signed by your DID key. Submit on-chain alongside your token transaction.</p>
       </div>
     </div>
   </div>
@@ -224,94 +198,38 @@
   <p>Anyone can verify a project's identity by checking three independent signatures. No account or API key needed.</p>
 
   <div class="verify-chain">
-    <div class="chain-item">
-      <div class="label">Step 1</div>
-      <div class="value">DID Document</div>
-    </div>
+    <div class="chain-item"><div class="chain-label">Step 1</div><div class="chain-value">DID Document</div></div>
     <div class="chain-arrow">&rarr;</div>
-    <div class="chain-item">
-      <div class="label">Step 2</div>
-      <div class="value">Credential (VC)</div>
-    </div>
+    <div class="chain-item"><div class="chain-label">Step 2</div><div class="chain-value">Credential</div></div>
     <div class="chain-arrow">&rarr;</div>
-    <div class="chain-item">
-      <div class="label">Step 3</div>
-      <div class="value">Platform Attestation</div>
-    </div>
+    <div class="chain-item"><div class="chain-label">Step 3</div><div class="chain-value">Attestation</div></div>
     <div class="chain-arrow">&rarr;</div>
-    <div class="chain-item">
-      <div class="label">Step 4</div>
-      <div class="value">Credential Status</div>
-    </div>
+    <div class="chain-item"><div class="chain-label">Step 4</div><div class="chain-value">Status</div></div>
   </div>
 
-  <h3>Step-by-Step Verification</h3>
-  <ol>
-    <li>
-      <strong>Fetch the Credential (VC):</strong> Call the credential's public URL. Read the <span class="code-inline">issuer</span> field to get the DID.
-    </li>
-    <li>
-      <strong>Fetch the DID Document:</strong> Call the public DID endpoint. Extract the public key (JWK) from
-      <span class="code-inline">verificationMethod[0].publicKeyJwk</span>.
-    </li>
-    <li>
-      <strong>Verify the DID Document signature:</strong> The <span class="code-inline">proof.signatureValue</span> in the DID Document
-      is a secp256k1 signature over the canonicalized <span class="code-inline">payload</span> object. Verify using the embedded public key.
-    </li>
-    <li>
-      <strong>Verify the VC signature:</strong> Remove the <span class="code-inline">proof</span> from the VC, canonicalize the remainder
-      (JSON with sorted keys), and verify <span class="code-inline">proof.jws</span> against the DID's public key.
-    </li>
-    <li>
-      <strong>Verify the Platform Attestation:</strong> The attestation contains the platform verifier's public key
-      (<span class="code-inline">verifierJwk</span>). Verify the attestation signature using that key.
-    </li>
-    <li>
-      <strong>Check Credential Status:</strong> Call the <span class="code-inline">credentialStatus.id</span> URL from the VC
-      to confirm the credential is <span class="code-inline">active</span> (not revoked).
-    </li>
+  <h3>Step-by-Step</h3>
+  <ol class="list">
+    <li><strong>Fetch the VC:</strong> Call the credential's public URL. Read <code>issuer</code> to get the DID.</li>
+    <li><strong>Fetch the DID Document:</strong> Call the public DID endpoint. Extract the public key from <code>verificationMethod[0].publicKeyJwk</code>.</li>
+    <li><strong>Verify the DID Document:</strong> The <code>proof.signatureValue</code> is a secp256k1 signature over the canonicalized <code>payload</code>.</li>
+    <li><strong>Verify the VC:</strong> Remove <code>proof</code>, canonicalize the remainder, verify <code>proof.jws</code> against the DID's public key.</li>
+    <li><strong>Verify the Attestation:</strong> The attestation contains the platform verifier's public key (<code>verifierJwk</code>). Verify its signature.</li>
+    <li><strong>Check Status:</strong> Call <code>credentialStatus.id</code> to confirm <code>active</code> (not revoked).</li>
   </ol>
 
   <div class="info-box">
-    <p><strong>Tip:</strong> On any credential page in the platform, the "Verify" button performs all these steps automatically and shows a pass/fail report.</p>
+    <p><strong>Tip:</strong> On any credential page, the "Verify" button performs all these steps automatically and shows a pass/fail report.</p>
   </div>
 
   <h3>Signature Details</h3>
   <div class="table-wrap">
     <table>
-      <thead>
-        <tr>
-          <th>Document</th>
-          <th>Signed By</th>
-          <th>Message (what's signed)</th>
-          <th>Signature Field</th>
-        </tr>
-      </thead>
+      <thead><tr><th>Document</th><th>Signed By</th><th>Message</th><th>Signature Field</th></tr></thead>
       <tbody>
-        <tr>
-          <td>DID Document</td>
-          <td>Project DID key</td>
-          <td><span class="code-inline">JSON.stringify(payload, sorted)</span></td>
-          <td><span class="code-inline">proof.signatureValue</span></td>
-        </tr>
-        <tr>
-          <td>Credential (VC)</td>
-          <td>Project DID key</td>
-          <td><span class="code-inline">JSON.stringify(vc_without_proof, sorted)</span></td>
-          <td><span class="code-inline">proof.jws</span></td>
-        </tr>
-        <tr>
-          <td>Platform Attestation</td>
-          <td>Platform verifier key</td>
-          <td><span class="code-inline">JSON.stringify(att_without_proof, sorted)</span></td>
-          <td><span class="code-inline">proof.signatureValue</span> or <span class="code-inline">proof.jws</span></td>
-        </tr>
-        <tr>
-          <td>725 Metadata</td>
-          <td>Project DID key</td>
-          <td>Metadata payload (policy scoped)</td>
-          <td><span class="code-inline">proof.signatureValue</span></td>
-        </tr>
+        <tr><td>DID Document</td><td>Project DID key</td><td><code>JSON.stringify(payload, sorted)</code></td><td><code>proof.signatureValue</code></td></tr>
+        <tr><td>Credential (VC)</td><td>Project DID key</td><td><code>JSON.stringify(vc_without_proof, sorted)</code></td><td><code>proof.jws</code></td></tr>
+        <tr><td>Platform Attestation</td><td>Platform verifier key</td><td><code>JSON.stringify(att_without_proof, sorted)</code></td><td><code>proof.signatureValue</code> or <code>proof.jws</code></td></tr>
+        <tr><td>725 Metadata</td><td>Project DID key</td><td>Metadata payload (policy scoped)</td><td><code>proof.signatureValue</code></td></tr>
       </tbody>
     </table>
   </div>
@@ -329,31 +247,14 @@
       <span class="api-desc">Fetch a Verifiable Credential</span>
     </div>
     <div class="api-body">
-      <p>Returns the full W3C Verifiable Credential JSON for the given credential ID.</p>
-      <h4>Response</h4>
+      <p>Returns the full W3C Verifiable Credential JSON.</p>
 <pre>{
   "@context": ["https://www.w3.org/2018/credentials/v1"],
   "type": ["VerifiableCredential", "TokenProjectVerification"],
-  "issuer": {
-    "id": "did:prism:abc123...",
-    "url": "https://identity.nmkr.io/api/dids/1/public"
-  },
+  "issuer": { "id": "did:prism:abc123...", "url": "https://identity.nmkr.io/api/dids/1/public" },
   "issuanceDate": "2025-01-15T12:00:00Z",
-  "credentialSubject": {
-    "id": "did:prism:abc123...",
-    "policyID": "a1b2c3d4...",
-    "assetName": "MyToken",
-    "label": "Main Collection"
-  },
-  "credentialStatus": {
-    "id": "https://identity.nmkr.io/api/credentials/1/status",
-    "type": "SimpleStatus"
-  },
-  "proof": {
-    "type": "EcdsaSecp256k1Signature2019",
-    "verificationMethod": "did:prism:abc123...#master-0",
-    "jws": "base64url_signature..."
-  }
+  "credentialSubject": { "id": "did:prism:abc123...", "policyID": "a1b2c3d4...", "label": "Main Collection" },
+  "proof": { "type": "EcdsaSecp256k1Signature2019", "jws": "base64url..." }
 }</pre>
     </div>
   </div>
@@ -362,17 +263,11 @@
     <div class="api-header" onclick="this.nextElementSibling.classList.toggle('open')">
       <span class="api-method get">GET</span>
       <span class="api-path">/api/credentials/{id}/status</span>
-      <span class="api-desc">Check credential status (active/revoked)</span>
+      <span class="api-desc">Check credential status</span>
     </div>
     <div class="api-body">
-      <p>Returns the current status of a credential. Use this to check if a credential has been revoked.</p>
-      <h4>Response</h4>
-<pre>{
-  "id": "https://identity.nmkr.io/api/credentials/1/status",
-  "type": "SimpleStatus",
-  "status": "active"
-}</pre>
-      <p>Possible <span class="code-inline">status</span> values: <span class="code-inline">active</span>, <span class="code-inline">revoked</span></p>
+      <p>Returns <code>active</code> or <code>revoked</code>.</p>
+<pre>{ "id": "https://identity.nmkr.io/api/credentials/1/status", "type": "SimpleStatus", "status": "active" }</pre>
     </div>
   </div>
 
@@ -383,31 +278,11 @@
       <span class="api-desc">Fetch DID Document + attestations</span>
     </div>
     <div class="api-body">
-      <p>Returns the DID Document, platform attestations, and KYC status for a given DID record.</p>
-      <h4>Response</h4>
+      <p>Returns the DID Document, platform attestations, and KYC status.</p>
 <pre>{
   "did": "did:prism:abc123...",
-  "didDocument": {
-    "@context": ["https://www.w3.org/ns/did/v1"],
-    "id": "did:prism:abc123...",
-    "payload": {
-      "date": "2025-01-15",
-      "legalName": "Example Corp",
-      "accounts": { "twitter": ["@example"] },
-      "website": ["https://example.com"]
-    },
-    "verificationMethod": [{
-      "id": "#master-0",
-      "type": "JsonWebKey2020",
-      "publicKeyJwk": { "kty": "EC", "crv": "secp256k1", "x": "...", "y": "..." }
-    }],
-    "proof": {
-      "type": "EcdsaSecp256k1Signature2019",
-      "verificationMethod": "#master-0",
-      "signatureValue": "base64url_signature..."
-    }
-  },
-  "attestations": [ ... ],
+  "didDocument": { "@context": [...], "id": "did:prism:abc123...", "payload": {...}, "verificationMethod": [...], "proof": {...} },
+  "attestations": [...],
   "kycStatus": "approved"
 }</pre>
     </div>
@@ -417,12 +292,9 @@
     <div class="api-header" onclick="this.nextElementSibling.classList.toggle('open')">
       <span class="api-method get">GET</span>
       <span class="api-path">/api/credentials/{id}/qr.png</span>
-      <span class="api-desc">QR code image for credential URL</span>
+      <span class="api-desc">QR code image (PNG)</span>
     </div>
-    <div class="api-body">
-      <p>Returns a PNG image of a QR code that encodes the public credential URL. Useful for sharing credentials in print or on websites.</p>
-      <p>Response type: <span class="code-inline">image/png</span></p>
-    </div>
+    <div class="api-body"><p>Returns a PNG QR code encoding the public credential URL.</p></div>
   </div>
 
   <div class="api-endpoint">
@@ -431,27 +303,20 @@
       <span class="api-path">/healthz</span>
       <span class="api-desc">Health check</span>
     </div>
-    <div class="api-body">
-      <p>Returns a simple health status. Useful for monitoring and load balancers.</p>
-<pre>{ "status": "ok" }</pre>
-    </div>
+    <div class="api-body"><pre>{ "status": "ok" }</pre></div>
   </div>
 
   <h3>Authenticated API</h3>
-  <p>The following endpoint requires authentication via a Bearer token (generated in Settings) or an active session.</p>
-
+  <p>Requires a Bearer token (generated in Settings) or an active session.</p>
   <div class="api-endpoint">
     <div class="api-header" onclick="this.nextElementSibling.classList.toggle('open')">
       <span class="api-method get">GET</span>
       <span class="api-path">/api/dids/{id}</span>
-      <span class="api-desc">Fetch DID (authenticated, owner only)</span>
+      <span class="api-desc">Fetch DID (owner only)</span>
     </div>
     <div class="api-body">
-      <p>Same response as the public DID endpoint, but requires authentication. Only the DID owner (or admin) can access this.</p>
-      <h4>Authentication</h4>
-      <p>Include a Bearer token in the <span class="code-inline">Authorization</span> header:</p>
+      <p>Same as the public endpoint but requires authentication. Include:</p>
 <pre>Authorization: Bearer your_api_token_here</pre>
-      <p>Generate an API token from the <a href="/settings">Settings</a> page.</p>
     </div>
   </div>
 </div>
@@ -459,52 +324,38 @@
 <!-- Integration Guide -->
 <div class="card doc-section" id="integration">
   <h2>Integration Guide</h2>
-  <p>How to use NMKR Identity credentials in your project, wallet, or marketplace.</p>
 
   <h3>For Token Projects</h3>
-  <ol>
-    <li><strong>Register</strong> and create a DID for your company/project.</li>
-    <li><strong>Complete KYC</strong> and wait for admin approval.</li>
-    <li><strong>Create a credential</strong> for each Cardano policy you manage. Include the policy ID and optional asset details.</li>
-    <li><strong>Generate 725 metadata</strong> for the credential. This produces a JSON file ready for on-chain submission.</li>
-    <li><strong>Submit metadata on-chain</strong> as part of your token minting transaction. The metadata references your DID and credential URL in the standard CIP-725 format.</li>
-    <li><strong>Share your credential URL</strong> with marketplaces and community. Anyone can verify it.</li>
+  <ol class="list">
+    <li>Register and create a DID for your company/project.</li>
+    <li>Complete KYC and wait for admin approval.</li>
+    <li>Create a credential for each Cardano policy. Include the policy ID.</li>
+    <li>Generate 725 metadata for the credential.</li>
+    <li>Submit metadata on-chain as part of your minting transaction.</li>
+    <li>Share your credential URL with marketplaces and community.</li>
   </ol>
 
-  <h3>For Wallets &amp; Marketplaces</h3>
-  <ol>
-    <li><strong>Read 725 metadata</strong> from on-chain transactions. Look for entries under the <span class="code-inline">725</span> key.</li>
-    <li><strong>Extract the DID and credential URL</strong> from the <span class="code-inline">files</span> array in the metadata.</li>
-    <li><strong>Fetch and verify</strong> using the public API endpoints. Check the DID Document signature, VC signature, and credential status.</li>
-    <li><strong>Display verification status</strong> in your UI (verified/unverified badge).</li>
+  <h3>For Wallets & Marketplaces</h3>
+  <ol class="list">
+    <li>Read 725 metadata from on-chain transactions (key: <code>725</code>).</li>
+    <li>Extract the DID and credential URL from the <code>files</code> array.</li>
+    <li>Fetch and verify using the public API endpoints.</li>
+    <li>Display verification status in your UI.</li>
   </ol>
 
   <h3>725 Metadata Structure</h3>
-  <p>The generated metadata follows the CIP-725 standard. Here's the structure:</p>
 <pre>{
   "725": {
     "1.0": {
       "{policy_id}": {
-        "{collection_name}": {
+        "{collection}": {
           "type": "JsonWebKey2020",
           "files": [
-            {
-              "src": "did:prism:abc123...",
-              "name": "Token-Identity",
-              "mediaType": "application/ld+json"
-            },
-            {
-              "src": "https://identity.nmkr.io/api/credentials/1",
-              "name": "Verification-Credential",
-              "mediaType": "application/vc+json"
-            }
+            { "src": "did:prism:abc...", "name": "Token-Identity", "mediaType": "application/ld+json" },
+            { "src": "https://identity.nmkr.io/api/credentials/1", "name": "Verification-Credential", "mediaType": "application/vc+json" }
           ],
           "@context": "https://www.w3.org/ns/did/v1",
-          "proof": {
-            "type": "EcdsaSecp256k1Signature2019",
-            "verificationMethod": "did:prism:abc123...#master-0",
-            "signatureValue": "base64url_signature..."
-          }
+          "proof": { "type": "EcdsaSecp256k1Signature2019", "signatureValue": "..." }
         }
       }
     }
@@ -512,7 +363,6 @@
 }</pre>
 
   <h3>Verification in Code</h3>
-  <p>To verify a credential programmatically (pseudocode):</p>
 <pre># 1. Fetch the credential
 vc = GET /api/credentials/{id}
 
@@ -526,126 +376,83 @@ verify_secp256k1(pubkey, did_payload, did_info.didDocument.proof.signatureValue)
 
 # 4. Verify VC signature
 vc_without_proof = remove_key(vc, "proof")
-vc_canonical = canonicalize(vc_without_proof)
-verify_secp256k1(pubkey, vc_canonical, vc.proof.jws)
+verify_secp256k1(pubkey, canonicalize(vc_without_proof), vc.proof.jws)
 
 # 5. Check status
 status = GET /api/credentials/{id}/status
 assert status.status == "active"</pre>
 
   <div class="warn-box">
-    <p><strong>Important:</strong> Always canonicalize JSON before verification. This means serializing with sorted keys and no extra whitespace. The platform uses <span class="code-inline">json.dumps(obj, sort_keys=True)</span> for Python.</p>
+    <p><strong>Important:</strong> Always canonicalize JSON before verification (sorted keys, no extra whitespace). The platform uses <code>json.dumps(obj, sort_keys=True)</code>.</p>
   </div>
 </div>
 
 <!-- Standards -->
 <div class="card doc-section" id="standards">
-  <h2>Standards &amp; Cryptography</h2>
-
+  <h2>Standards & Cryptography</h2>
   <div class="table-wrap">
     <table>
-      <thead>
-        <tr>
-          <th>Standard</th>
-          <th>Usage</th>
-          <th>Reference</th>
-        </tr>
-      </thead>
+      <thead><tr><th>Standard</th><th>Usage</th><th>Reference</th></tr></thead>
       <tbody>
-        <tr>
-          <td>W3C DID Core</td>
-          <td>DID Document structure and resolution</td>
-          <td>w3.org/TR/did-core</td>
-        </tr>
-        <tr>
-          <td>W3C Verifiable Credentials</td>
-          <td>Credential format, issuance, and verification</td>
-          <td>w3.org/TR/vc-data-model</td>
-        </tr>
-        <tr>
-          <td>Atala PRISM</td>
-          <td>DID method (<span class="code-inline">did:prism</span>)</td>
-          <td>atalaprism.io</td>
-        </tr>
-        <tr>
-          <td>CIP-725</td>
-          <td>Cardano on-chain token identity metadata</td>
-          <td>Cardano Improvement Proposal</td>
-        </tr>
-        <tr>
-          <td>secp256k1</td>
-          <td>Elliptic curve for all signatures</td>
-          <td>SEC 2 / Bitcoin curve</td>
-        </tr>
-        <tr>
-          <td>ECDSA (RFC 6979)</td>
-          <td>Deterministic signatures for reproducibility</td>
-          <td>tools.ietf.org/html/rfc6979</td>
-        </tr>
-        <tr>
-          <td>JsonWebKey2020</td>
-          <td>Public key representation in DID Documents</td>
-          <td>w3.org/TR/did-spec-registries</td>
-        </tr>
-        <tr>
-          <td>PBKDF2 + Fernet</td>
-          <td>Private key encryption (200k iterations, SHA-256)</td>
-          <td>NIST SP 800-132</td>
-        </tr>
+        <tr><td>W3C DID Core</td><td>DID Document structure and resolution</td><td>w3.org/TR/did-core</td></tr>
+        <tr><td>W3C Verifiable Credentials</td><td>Credential format and verification</td><td>w3.org/TR/vc-data-model</td></tr>
+        <tr><td>Atala PRISM</td><td>DID method (<code>did:prism</code>)</td><td>atalaprism.io</td></tr>
+        <tr><td>CIP-725</td><td>Cardano on-chain token identity metadata</td><td>Cardano Improvement Proposal</td></tr>
+        <tr><td>secp256k1</td><td>Elliptic curve for all signatures</td><td>SEC 2 / Bitcoin curve</td></tr>
+        <tr><td>ECDSA (RFC 6979)</td><td>Deterministic signatures</td><td>tools.ietf.org/html/rfc6979</td></tr>
+        <tr><td>JsonWebKey2020</td><td>Public key representation in DIDs</td><td>w3.org/TR/did-spec-registries</td></tr>
+        <tr><td>PBKDF2 + Fernet</td><td>Private key encryption (200k iterations)</td><td>NIST SP 800-132</td></tr>
       </tbody>
     </table>
   </div>
 
   <h3>Design Decisions</h3>
-  <ul>
-    <li><strong>Self-signed DIDs:</strong> The DID Document is signed by the DID's own key. No external authority is needed to create or validate a DID.</li>
-    <li><strong>Issuer is a DID:</strong> Credential issuers are identified by their DID, not a centralized account. Keys are resolved from the DID Document.</li>
-    <li><strong>Platform attestation as VC:</strong> The platform's endorsement is itself a standard W3C Verifiable Credential, signed by the platform's own DID. This makes the trust chain uniform.</li>
-    <li><strong>Canonical JSON:</strong> All signatures are computed over JSON serialized with sorted keys. This ensures signature stability across implementations.</li>
-    <li><strong>No blockchain writes:</strong> The platform generates metadata but does not submit transactions. You choose when and where to publish on-chain.</li>
-    <li><strong>Key never stored in plaintext:</strong> Private keys are encrypted immediately after generation and the passphrase is shown only once during the session.</li>
+  <ul class="list">
+    <li><strong>Self-signed DIDs:</strong> No external authority needed to create or validate.</li>
+    <li><strong>Issuer is a DID:</strong> Credential issuers are identified by DID, not a centralized account.</li>
+    <li><strong>Attestation as VC:</strong> The platform's endorsement is a standard W3C VC, keeping the trust chain uniform.</li>
+    <li><strong>Canonical JSON:</strong> Signatures computed over sorted-key JSON for stability across implementations.</li>
+    <li><strong>No blockchain writes:</strong> The platform generates metadata; you choose when to publish on-chain.</li>
+    <li><strong>Key never stored in plaintext:</strong> Encrypted immediately; passphrase shown once.</li>
   </ul>
 </div>
 
 <!-- FAQ -->
 <div class="card doc-section" id="faq">
-  <h2>Frequently Asked Questions</h2>
+  <h2>FAQ</h2>
 
   <h3>What is a DID?</h3>
-  <p>A Decentralized Identifier (DID) is a globally unique identifier that you control. Unlike usernames or email addresses, no central authority can revoke or modify your DID. It's tied to a cryptographic keypair &mdash; you hold the private key, and the public key is embedded in your DID Document.</p>
+  <p>A Decentralized Identifier &mdash; a globally unique identifier you control, tied to a cryptographic keypair. No central authority can revoke or modify it.</p>
 
-  <h3>What happens if I lose my key?</h3>
-  <p>Your private key is encrypted and downloadable only once during DID creation. If you lose the key file and passphrase, you cannot sign new credentials or generate metadata for that DID. You would need to create a new DID. We strongly recommend backing up your key file in a secure location.</p>
+  <h3>What if I lose my key?</h3>
+  <p>Your private key is downloadable only once. If lost, you cannot sign credentials for that DID and would need to create a new one. Back up your key file securely.</p>
 
   <h3>Can I have multiple DIDs?</h3>
-  <p>Yes. Each DID represents a company or project. You can create multiple DIDs under one account, each with its own keypair, KYC process, and credentials.</p>
+  <p>Yes. Each DID represents a company or project with its own keypair and KYC process.</p>
 
   <h3>Can I have multiple credentials per DID?</h3>
-  <p>Yes. Each credential is scoped to a specific Cardano policy ID and optionally an asset name. A single DID (company) can issue credentials for multiple policies/assets.</p>
+  <p>Yes. Each credential is scoped to a Cardano policy ID and optionally an asset name.</p>
 
-  <h3>What is the 725 metadata for?</h3>
-  <p>CIP-725 metadata is designed to be submitted on-chain alongside Cardano token transactions. It contains references to your DID and credential, signed by your DID key. Wallets and marketplaces that support CIP-725 can display verified identity information for your tokens.</p>
+  <h3>What is 725 metadata for?</h3>
+  <p>CIP-725 metadata is submitted on-chain alongside Cardano transactions. It references your DID and credential, signed by your key. CIP-725-aware wallets can display verified identity.</p>
 
   <h3>Can anyone verify my credentials?</h3>
-  <p>Yes. All credential and DID data is accessible via public API endpoints. No account or API key is needed to verify. The platform also provides a built-in "Verify" button that performs all verification steps and shows results.</p>
+  <p>Yes. All data is accessible via public API. No account needed. The platform also provides a built-in "Verify" button.</p>
 
   <h3>What documents are needed for KYC?</h3>
-  <p>Typical KYC documents include company registration certificates, proof of address, and identification of authorized representatives. The specific requirements depend on your jurisdiction and project type. Accepted formats: PDF, PNG, JPG, WEBP (max 25 MB each).</p>
+  <p>Typically: company registration certificates, proof of address, ID of authorized representatives. Accepted formats: PDF, PNG, JPG, WEBP (max 25 MB).</p>
 
-  <h3>Is the platform open source?</h3>
-  <p>The token identity library (<span class="code-inline">token_identity</span>) for DID/VC generation is standalone and reusable. The web platform manages accounts, KYC workflows, and credential lifecycle.</p>
-
-  <h3>What curve is used for signatures?</h3>
-  <p>All signatures use the <strong>secp256k1</strong> elliptic curve with deterministic ECDSA (RFC 6979). This is the same curve used by Bitcoin and Cardano, ensuring broad compatibility with existing tooling.</p>
+  <h3>What curve is used?</h3>
+  <p><strong>secp256k1</strong> with deterministic ECDSA (RFC 6979) &mdash; the same curve used by Bitcoin and Cardano.</p>
 
   <h3>How do I revoke a credential?</h3>
-  <p>On the credential detail page, use the "Revoke" button. This sets the credential status to <span class="code-inline">revoked</span>. The status endpoint will immediately reflect the change, and verifiers checking the status URL will see the revocation.</p>
+  <p>Use the "Revoke" button on the credential page. The status endpoint immediately reflects the revocation.</p>
 
   <h3>What is RWA support?</h3>
-  <p>Real-World Asset (RWA) credentials can include additional fields: asset type, jurisdiction, and registration number. These fields are embedded in the credential's <span class="code-inline">credentialSubject</span> and are useful for tokenized securities, real estate, and other regulated assets.</p>
+  <p>Real-World Asset credentials include asset type, jurisdiction, and registration number in the <code>credentialSubject</code>.</p>
 </div>
 
-<div class="small muted" style="text-align:center; margin-top:16px; margin-bottom: 32px; line-height:1.8;">
+<div class="site-footer">
   utxo AG &middot; Dammstrasse 16, 6300 Zug, Switzerland
 </div>
 {% endblock %}
