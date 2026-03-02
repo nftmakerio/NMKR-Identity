@@ -3,7 +3,7 @@
 <style>
   .admin-table { overflow-x: auto; }
   .admin-table td { font-size: 13px; }
-  .admin-table .did-col { font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); word-break: break-all; max-width: 200px; }
+  .admin-table .did-col { font-family: var(--mono); font-size: 11px; color: var(--text-muted); word-break: break-all; max-width: 200px; }
   .admin-table .action-col { min-width: 240px; }
   .approve-form textarea { width: 100%; height: 56px; font-size: 13px; margin-bottom: 8px; }
 </style>
@@ -36,7 +36,7 @@
         <td>{{ d.owner_email }}</td>
         <td class="did-col">{{ d.did_id }}</td>
         <td><span class="badge {{ d.kyc_status }}">{{ d.kyc_status }}</span></td>
-        <td style="font-family:var(--font-mono); font-size:13px;">{{ d.attestation_count }}</td>
+        <td style="font-family:var(--mono); font-size:13px;">{{ d.attestation_count }}</td>
         <td class="action-col">
           <a href="/admin/did/{{ d.id }}" style="font-size:13px; font-weight:600;">Review</a>
           {% if d.kyc_status != 'approved' %}

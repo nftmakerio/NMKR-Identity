@@ -30,9 +30,9 @@
   </div>
 
   <div style="display:flex; gap:8px; margin:20px 0;">
-    <div class="chip" style="{% if rec.kyc_status in ['submitted','approved','rejected'] %}background:var(--accent-soft); border-color:rgba(17,242,80,.3);{% endif %}">Submitted</div>
-    <div class="chip" style="{% if rec.kyc_status=='approved' %}background:var(--success-soft); border-color:rgba(34,197,94,.3);{% endif %}">Approved</div>
-    <div class="chip" style="{% if rec.kyc_status=='rejected' %}background:var(--danger-soft); border-color:rgba(239,68,68,.2);{% endif %}">Rejected</div>
+    <div class="chip" style="{% if rec.kyc_status in ['submitted','approved','rejected'] %}background:var(--nmkr-glow); border-color:rgba(17,242,80,.3);{% endif %}">Submitted</div>
+    <div class="chip" style="{% if rec.kyc_status=='approved' %}background:var(--success-soft); border-color:rgba(17,242,80,.3);{% endif %}">Approved</div>
+    <div class="chip" style="{% if rec.kyc_status=='rejected' %}background:var(--danger-soft); border-color:rgba(229,53,53,.15);{% endif %}">Rejected</div>
   </div>
 
   {% if rec.kyc_status == 'approved' %}

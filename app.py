@@ -29,6 +29,7 @@ import hashlib
 import zipfile
 from io import BytesIO
 import base64
+import urllib.request
 from ecdsa import VerifyingKey, SECP256k1
 
 from token_identity.models import TokenIdentity
@@ -129,6 +130,39 @@ def create_app() -> Flask:
     # Verifier key (admin signer) setup
     verifier_priv = os.environ.get("VERIFIER_PRIVKEY_HEX")
     app.config["VERIFIER"] = VerifierKey(privkey_hex=verifier_priv, name="PlatformVerifier")
+
+    def _send_email(to_email: str, subject: str, body: str) -> bool:
+        api_key = os.environ.get("AGENTMAIL_API_KEY")
+        if not api_key:
+            return False
+        try:
+            inbox_id = app.config.get("_AGENTMAIL_INBOX_ID")
+            if not inbox_id:
+                req = urllib.request.Request(
+                    "https://api.agentmail.to/v0/inboxes",
+                    data=json.dumps({}).encode(),
+                    headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+                    method="POST",
+                )
+                with urllib.request.urlopen(req, timeout=10) as resp:
+                    data = json.loads(resp.read())
+                    inbox_id = data.get("address") or data.get("id") or data.get("email")
+                    if inbox_id:
+                        app.config["_AGENTMAIL_INBOX_ID"] = inbox_id
+            if not inbox_id:
+                return False
+            send_data = {"to": to_email, "subject": subject, "text": body}
+            req = urllib.request.Request(
+                f"https://api.agentmail.to/v0/inboxes/{inbox_id}/messages",
+                data=json.dumps(send_data).encode(),
+                headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+                method="POST",
+            )
+            with urllib.request.urlopen(req, timeout=10) as resp:
+                return resp.status in (200, 201)
+        except Exception as e:
+            app.logger.warning("Email send failed: %s", e)
+            return False
 
     @app.get("/")
     def index():
@@ -264,13 +298,18 @@ def create_app() -> Flask:
         email = form.email.data.strip().lower()
         with session_scope(Session) as s:
             u = s.scalar(select(User).where(User.email == email))
-            if not u:
-                flash("If the email exists, a reset link was generated.", "info")
-                return redirect(url_for("login_page"))
-            import secrets
-            tok = secrets.token_urlsafe(24)
-            s.add(EmailToken(user_id=u.id, token=tok, purpose="reset"))
-            flash(f"Password reset link: /reset?token={tok}", "info")
+            if u:
+                import secrets
+                tok = secrets.token_urlsafe(24)
+                s.add(EmailToken(user_id=u.id, token=tok, purpose="reset"))
+                base = app.config.get("BASE_URL") or request.host_url.rstrip("/")
+                link = f"{base}/reset?token={tok}"
+                _send_email(
+                    u.email,
+                    "NMKR Identity — Password Reset",
+                    f"Click the link below to reset your password:\n\n{link}\n\nIf you did not request this, ignore this email.",
+                )
+        flash("If that email is registered, a reset link has been sent.", "info")
         return redirect(url_for("login_page"))
 
     @app.get("/reset")
