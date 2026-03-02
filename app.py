@@ -1306,6 +1306,11 @@ def create_app() -> Flask:
     def about():
         return render_template("about.html")
 
+    # Public documentation
+    @app.get("/docs")
+    def docs():
+        return render_template("docs.html")
+
     # Wizard: Step 1 - Start
     @app.get("/wizard/start")
     @login_required
