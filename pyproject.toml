@@ -13,5 +13,6 @@ dependencies = [
 ]
 
 [project.scripts]
+nmkr-identity = "token_identity.cli:main"
 token-identity = "token_identity.cli:main"
 
