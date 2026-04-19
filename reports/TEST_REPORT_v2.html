@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>TEST REPORT v2</title>
+    <style>
+@media print {
+    body { margin: 0; }
+    @page { margin: 2cm; }
+}
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    font-size: 11pt;
+    line-height: 1.6;
+    color: #333;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+h1 {
+    color: #000;
+    border-bottom: 2px solid #11F250;
+    padding-bottom: 0.3em;
+    margin-top: 1.5em;
+}
+h2 {
+    color: #222;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 0.2em;
+    margin-top: 1.2em;
+}
+h3 { color: #333; margin-top: 1em; }
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+    font-size: 10pt;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+th { background-color: #f5f5f5; font-weight: bold; }
+tr:nth-child(even) { background-color: #fafafa; }
+code {
+    background-color: #f4f4f4;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+    font-size: 9pt;
+}
+pre {
+    background-color: #f4f4f4;
+    padding: 12px;
+    border-radius: 4px;
+    overflow-x: auto;
+    font-size: 9pt;
+    line-height: 1.4;
+    white-space: pre-wrap;
+}
+pre code { background: none; padding: 0; }
+hr { border: none; border-top: 1px solid #ddd; margin: 2em 0; }
+strong { color: #000; }
+.print-instructions {
+    background: #fffde7;
+    border: 1px solid #ffc107;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 2rem;
+}
+@media print { .print-instructions { display: none; } }
+</style>
+</head>
+<body>
+    <div class="print-instructions">
+        <strong>To save as PDF:</strong> Press Cmd+P (Mac) or Ctrl+P (Windows), then select "Save as PDF" as the destination.
+    </div>
+    <h1>NMKR Identity Platform - Test Report v2 (Post-Fix)</h1>
+
+<strong>Date:</strong> 2026-01-18
+<strong>Platform:</strong> https://identity.nmkr.io/
+<strong>Tested By:</strong> Automated Testing Suite
+<strong>Version:</strong> Post-Fix (BUG-001 Resolved)
+
+<hr>
+
+<h2>Executive Summary</h2>
+
+<table>
+<thead><tr><th>Category</th><th>Status</th><th>Details</th></tr></thead>
+<tbody>
+<tr><td>Unit Tests</td><td><strong>99/99 PASSED</strong></td><td>All tests passing</td></tr>
+<tr><td>UI Tests</td><td><strong>ALL PASSED</strong></td><td>All pages functional</td></tr>
+<tr><td>API Tests</td><td><strong>ALL PASSED</strong></td><td>Health and error handling verified</td></tr>
+<tr><td>Security</td><td><strong>PASSED</strong></td><td>Auth redirects, CSRF, error messages OK</td></tr>
+</tbody>
+</table>
+
+<strong>Overall Assessment:</strong> All tests pass. BUG-001 has been resolved.
+
+<hr>
+
+<h2>1. Test Results</h2>
+
+<h3>1.1 Test Summary</h3>
+
+<pre><code>============================= test session starts ==============================
+platform darwin -- Python 3.14.2, pytest-9.0.2
+collected 99 items
+
+tests/test_attestation.py    21 passed
+tests/test_crypto.py         22 passed
+tests/test_prism_did.py      37 passed
+tests/test_webapp_crypto.py  19 passed
+============================== 99 passed in 2.18s ==============================
+</code></pre>
+
+<h3>1.2 Test Breakdown by Module</h3>
+
+<table>
+<thead><tr><th>Module</th><th>Tests</th><th>Pass Rate</th></tr></thead>
+<tbody>
+<tr><td>token_identity/crypto.py</td><td>22</td><td>100%</td></tr>
+<tr><td>token_identity/prism_did.py</td><td>37</td><td>100%</td></tr>
+<tr><td>token_identity/attestation.py</td><td>21</td><td>100%</td></tr>
+<tr><td>webapp/crypto_utils.py</td><td>19</td><td>100%</td></tr>
+<tr><td><strong>TOTAL</strong></td><td><strong>99</strong></td><td><strong>100%</strong></td></tr>
+</tbody>
+</table>
+
+<hr>
+
+<h2>2. Bug Fix Summary</h2>
+
+<h3>BUG-001: RESOLVED</h3>
+
+<strong>Issue:</strong> Test <code>test_verify_tampered_metadata_fails</code> was failing
+
+<strong>Root Cause:</strong> The test code used <code>list(md["725"].keys())[0]</code> which returns <code>"version"</code> (the first key in insertion order). The condition <code>if pol != "version":</code> was False, so the tampering code never executed.
+
+<strong>Fix Applied:</strong> Changed the test to properly select the policy key:
+
+<pre><code># Before (buggy test)
+pol = list(md["725"].keys())[0]
+if pol != "version":
+    coll = list(md["725"][pol].keys())[0]
+    md["725"][pol][coll]["files"][0]["name"] = "tampered"
+
+<h1>After (fixed test)</h1>
+policy_keys = [k for k in md["725"].keys() if k != "version"]
+pol = policy_keys[0]
+coll = list(md["725"][pol].keys())[0]
+md["725"][pol][coll]["files"][0]["name"] = "tampered"
+</code></pre>
+
+<strong>Result:</strong> The <code>verify_metadata()</code> function correctly detects tampering. The cryptographic verification was working correctly all along.
+
+<strong>File Changed:</strong> <code>tests/test_prism_did.py:323-333</code>
+
+<hr>
+
+<h2>3. Validation Confirmation</h2>
+
+<h3>3.1 Cryptographic Integrity</h3>
+
+<table>
+<thead><tr><th>Test</th><th>Result</th></tr></thead>
+<tbody>
+<tr><td>Valid metadata verification</td><td>PASS</td></tr>
+<tr><td>Tampered metadata detection</td><td>PASS</td></tr>
+<tr><td>Wrong DID detection</td><td>PASS</td></tr>
+<tr><td>Signature verification</td><td>PASS</td></tr>
+</tbody>
+</table>
+
+<h3>3.2 Security Validation</h3>
+
+<table>
+<thead><tr><th>Check</th><th>Status</th></tr></thead>
+<tbody>
+<tr><td>Authentication Required</td><td>PASS</td></tr>
+<tr><td>CSRF Protection</td><td>PASS</td></tr>
+<tr><td>Password Hashing</td><td>PASS</td></tr>
+<tr><td>Key Encryption (PBKDF2 + Fernet)</td><td>PASS</td></tr>
+<tr><td>Error Messages</td><td>PASS</td></tr>
+</tbody>
+</table>
+
+<hr>
+
+<h2>4. Comparison: Before vs After Fix</h2>
+
+<table>
+<thead><tr><th>Metric</th><th>v1 (Before)</th><th>v2 (After)</th></tr></thead>
+<tbody>
+<tr><td>Total Tests</td><td>99</td><td>99</td></tr>
+<tr><td>Passed</td><td>98</td><td>99</td></tr>
+<tr><td>Failed</td><td>1</td><td>0</td></tr>
+<tr><td>Pass Rate</td><td>98.99%</td><td><strong>100%</strong></td></tr>
+<tr><td>Bugs</td><td>1 (BUG-001)</td><td>0</td></tr>
+</tbody>
+</table>
+
+<hr>
+
+<h2>5. Conclusion</h2>
+
+The NMKR Identity Platform test suite now passes completely. The single failing test was due to a bug in the test code itself, not in the platform's cryptographic verification logic. The <code>verify_metadata()</code> function correctly detects content tampering as designed.
+
+<strong>Final Status: ALL TESTS PASSING</strong>
+
+<hr>
+
+*Report generated: 2026-01-18*
+*Fix applied: tests/test_prism_did.py*
+
+</body>
+</html>

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>BUG REPORT v2</title>
+    <style>
+@media print {
+    body { margin: 0; }
+    @page { margin: 2cm; }
+}
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    font-size: 11pt;
+    line-height: 1.6;
+    color: #333;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+h1 {
+    color: #000;
+    border-bottom: 2px solid #11F250;
+    padding-bottom: 0.3em;
+    margin-top: 1.5em;
+}
+h2 {
+    color: #222;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 0.2em;
+    margin-top: 1.2em;
+}
+h3 { color: #333; margin-top: 1em; }
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1em 0;
+    font-size: 10pt;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+th { background-color: #f5f5f5; font-weight: bold; }
+tr:nth-child(even) { background-color: #fafafa; }
+code {
+    background-color: #f4f4f4;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+    font-size: 9pt;
+}
+pre {
+    background-color: #f4f4f4;
+    padding: 12px;
+    border-radius: 4px;
+    overflow-x: auto;
+    font-size: 9pt;
+    line-height: 1.4;
+    white-space: pre-wrap;
+}
+pre code { background: none; padding: 0; }
+hr { border: none; border-top: 1px solid #ddd; margin: 2em 0; }
+strong { color: #000; }
+.print-instructions {
+    background: #fffde7;
+    border: 1px solid #ffc107;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 2rem;
+}
+@media print { .print-instructions { display: none; } }
+</style>
+</head>
+<body>
+    <div class="print-instructions">
+        <strong>To save as PDF:</strong> Press Cmd+P (Mac) or Ctrl+P (Windows), then select "Save as PDF" as the destination.
+    </div>
+    <h1>Bug Report - NMKR Identity Platform (Resolved)</h1>
+
+<strong>Date:</strong> 2026-01-18
+<strong>Reporter:</strong> Automated Testing Suite
+<strong>Version:</strong> Post-Fix
+
+<hr>
+
+<h2>BUG-001: Test Case Bug in Metadata Verification Test</h2>
+
+<h3>Summary</h3>
+
+<table>
+<thead><tr><th>Field</th><th>Value</th></tr></thead>
+<tbody>
+<tr><td><strong>ID</strong></td><td>BUG-001</td></tr>
+<tr><td><strong>Severity</strong></td><td>LOW</td></tr>
+<tr><td><strong>Priority</strong></td><td>P3</td></tr>
+<tr><td><strong>Status</strong></td><td><strong>RESOLVED</strong></td></tr>
+<tr><td><strong>Component</strong></td><td><code>tests/test_prism_did.py</code></td></tr>
+<tr><td><strong>Function</strong></td><td><code>TestVerifyMetadata.test_verify_tampered_metadata_fails</code></td></tr>
+</tbody>
+</table>
+
+<hr>
+
+<h3>Original Issue</h3>
+
+The test <code>test_verify_tampered_metadata_fails</code> was failing, appearing to indicate that metadata verification did not detect tampering.
+
+<h3>Root Cause Analysis</h3>
+
+The bug was in the <strong>test code</strong>, not in the <code>verify_metadata()</code> function.
+
+<strong>Problem:</strong> The test used this logic to select the policy key:
+
+<pre><code>pol = list(md["725"].keys())[0]
+if pol != "version":
+    coll = list(md["725"][pol].keys())[0]
+    md["725"][pol][coll]["files"][0]["name"] = "tampered"
+</code></pre>
+
+<strong>Issue:</strong> In Python 3.7+, dictionaries maintain insertion order. The metadata is constructed as:
+
+<pre><code>md = {
+    "725": {
+        "version": "1.0",     # First key
+        pol: { ... },          # Second key
+    }
+}
+</code></pre>
+
+So <code>list(md["725"].keys())[0]</code> returns <code>"version"</code>, not the policy ID.
+
+<strong>Result:</strong> The condition <code>if pol != "version":</code> evaluated to <code>False</code>, so the tampering block never executed. The test was verifying an unmodified document and expecting <code>False</code>.
+
+<hr>
+
+<h3>Fix Applied</h3>
+
+<strong>File:</strong> <code>tests/test_prism_did.py:323-333</code>
+
+<strong>Before:</strong>
+<pre><code>def test_verify_tampered_metadata_fails(self, basic_identity):
+    mgr = PrismDIDManager(basic_identity, seed=b"test")
+    doc = mgr.create_did_document()
+    md = mgr.create_token_metadata(doc["id"])
+    # Tamper with the data
+    pol = list(md["725"].keys())[0]
+    if pol != "version":
+        coll = list(md["725"][pol].keys())[0]
+        md["725"][pol][coll]["files"][0]["name"] = "tampered"
+    assert mgr.verify_metadata(md, doc["id"]) is False
+</code></pre>
+
+<strong>After:</strong>
+<pre><code>def test_verify_tampered_metadata_fails(self, basic_identity):
+    mgr = PrismDIDManager(basic_identity, seed=b"test")
+    doc = mgr.create_did_document()
+    md = mgr.create_token_metadata(doc["id"])
+    # Find the policy key (skip "version")
+    policy_keys = [k for k in md["725"].keys() if k != "version"]
+    pol = policy_keys[0]
+    coll = list(md["725"][pol].keys())[0]
+    # Tamper with the file name
+    md["725"][pol][coll]["files"][0]["name"] = "tampered"
+    assert mgr.verify_metadata(md, doc["id"]) is False
+</code></pre>
+
+<hr>
+
+<h3>Verification</h3>
+
+After the fix:
+
+<pre><code>tests/test_prism_did.py::TestVerifyMetadata::test_verify_valid_metadata PASSED
+tests/test_prism_did.py::TestVerifyMetadata::test_verify_tampered_metadata_fails PASSED
+tests/test_prism_did.py::TestVerifyMetadata::test_verify_wrong_did_fails PASSED
+</code></pre>
+
+The <code>verify_metadata()</code> function <strong>correctly detects tampering</strong> when content is modified after signing.
+
+<hr>
+
+<h3>Key Finding</h3>
+
+<strong>The cryptographic verification in <code>verify_metadata()</code> was working correctly all along.</strong> The signature verification properly detects any changes to the signed content. The apparent "bug" was actually a test case error that prevented tampering from occurring.
+
+<hr>
+
+<h2>Test Results Summary (Post-Fix)</h2>
+
+<table>
+<thead><tr><th>Total Tests</th><th>Passed</th><th>Failed</th><th>Pass Rate</th></tr></thead>
+<tbody>
+<tr><td>99</td><td>99</td><td>0</td><td><strong>100%</strong></td></tr>
+</tbody>
+</table>
+
+<hr>
+
+<h3>Lessons Learned</h3>
+
+1. When iterating over dictionary keys, be aware of insertion order in Python 3.7+
+2. Test code should explicitly select the intended key rather than relying on positional access
+3. Use list comprehensions with filters for clearer, more reliable key selection
+
+<hr>
+
+*Bug resolved: 2026-01-18*
+*Resolution verified with 99/99 tests passing*
+
+</body>
+</html>
