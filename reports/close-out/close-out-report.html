@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Project 1000089 — Catalyst Close-out Report</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --nmkr:        #11F250;
+    --nmkr-ink:    #021205;
+    --nmkr-glow:   rgba(17, 242, 80, 0.18);
+    --ink:         #0B1220;
+    --ink-2:       #1F2937;
+    --muted:       #4B5563;
+    --muted-2:     #6B7280;
+    --line:        #E5E7EB;
+    --line-soft:   #F1F3F5;
+    --paper:       #FFFFFF;
+    --paper-2:     #FAFBFC;
+    --amber-bg:    #FFFBEB;
+    --amber-line:  #F59E0B;
+    --amber-ink:   #92400E;
+  }
+
+  @page { size: A4; margin: 11mm 12mm 11mm 12mm; }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color: var(--ink);
+    font-size: 9.1pt;
+    line-height: 1.42;
+    -webkit-font-smoothing: antialiased;
+  }
+  code, .mono { font-family: 'JetBrains Mono', 'SF Mono', Menlo, monospace; font-size: 0.88em; }
+
+  /* ---------- Banner ---------- */
+
+  .banner {
+    background: var(--nmkr-ink);
+    color: #F5FFF7;
+    padding: 11pt 15pt 10pt;
+    border-radius: 5pt;
+    margin-bottom: 6pt;
+    position: relative;
+    overflow: hidden;
+  }
+  .banner::after {
+    content: "";
+    position: absolute; right: -50pt; top: -50pt;
+    width: 140pt; height: 140pt; border-radius: 50%;
+    background: radial-gradient(circle, var(--nmkr-glow) 0%, transparent 70%);
+  }
+  .banner .eyebrow {
+    color: var(--nmkr);
+    font-size: 7.5pt;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin: 0 0 3pt 0;
+  }
+  .banner h1 {
+    margin: 0 0 3pt 0;
+    font-size: 16pt;
+    font-weight: 800;
+    letter-spacing: -0.015em;
+    line-height: 1.1;
+    max-width: 90%;
+  }
+  .banner .sub {
+    color: #B7D9BE;
+    font-size: 8.5pt;
+    font-weight: 500;
+    margin: 0 0 9pt 0;
+  }
+  .banner .meta {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6pt;
+    margin-top: 4pt;
+  }
+  .banner .meta .cell {
+    border-left: 2pt solid var(--nmkr);
+    padding: 2pt 0 2pt 8pt;
+  }
+  .banner .meta .label {
+    font-size: 7pt;
+    color: #7EC790;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin: 0 0 1pt 0;
+    font-weight: 600;
+  }
+  .banner .meta .value {
+    font-size: 9pt;
+    color: #F5FFF7;
+    font-weight: 600;
+    margin: 0;
+  }
+
+  /* ---------- Typography ---------- */
+
+  h2 {
+    font-size: 10.5pt;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--nmkr-ink);
+    margin: 7pt 0 3pt 0;
+    padding-bottom: 2pt;
+    border-bottom: 1pt solid var(--line);
+  }
+  h2 .ix {
+    display: inline-block;
+    color: var(--nmkr-ink);
+    background: var(--nmkr);
+    font-size: 7pt; font-weight: 700;
+    border-radius: 3pt;
+    padding: 1pt 4pt;
+    margin-right: 5pt;
+    vertical-align: 2pt;
+    letter-spacing: 0.08em;
+  }
+  h3 { font-size: 9pt; font-weight: 700; margin: 5pt 0 2pt 0; color: var(--ink); }
+  p { margin: 0 0 3pt 0; }
+  ul { margin: 2pt 0 3pt 0; padding-left: 14pt; }
+  li { margin-bottom: 1.5pt; }
+  a { color: var(--nmkr-ink); text-decoration: underline; text-decoration-color: var(--nmkr); text-underline-offset: 2pt; word-break: break-word; }
+
+  /* ---------- Facts strip ---------- */
+
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    border: 1pt solid var(--line);
+    border-radius: 4pt;
+    overflow: hidden;
+    margin: 6pt 0 6pt 0;
+  }
+  .facts .fact { padding: 6pt 10pt; border-right: 1pt solid var(--line); }
+  .facts .fact:last-child { border-right: 0; }
+  .facts .fact .k {
+    font-size: 7pt; color: var(--muted-2);
+    text-transform: uppercase; letter-spacing: 0.12em; font-weight: 600;
+  }
+  .facts .fact .v { font-size: 9.5pt; color: var(--ink); margin-top: 2pt; font-weight: 600; }
+  .facts .fact .v .mono { font-size: 0.92em; }
+
+  /* ---------- Tables ---------- */
+
+  table { width: 100%; border-collapse: collapse; margin: 3pt 0 5pt 0; font-size: 8pt; }
+  th, td { text-align: left; vertical-align: top; padding: 3pt 5pt; border-bottom: 1pt solid var(--line-soft); }
+  thead th {
+    background: var(--paper-2); color: var(--muted);
+    text-transform: uppercase; font-size: 7pt; letter-spacing: 0.1em; font-weight: 700;
+    border-bottom: 1pt solid var(--line);
+  }
+  tbody tr:last-child td { border-bottom: 0; }
+  td .tag {
+    display: inline-block;
+    font-size: 7pt; font-weight: 700; letter-spacing: 0.08em;
+    padding: 1pt 5pt; border-radius: 3pt; text-transform: uppercase;
+  }
+  .tag.met  { background: #DCFCE7; color: #166534; }
+  .tag.part { background: #FEF3C7; color: #92400E; }
+  .tag.miss { background: #FEE2E2; color: #991B1B; }
+
+  /* ---------- Callouts ---------- */
+
+  .callout {
+    background: var(--paper-2);
+    border: 1pt solid var(--line);
+    border-left: 3pt solid var(--nmkr);
+    border-radius: 3pt;
+    padding: 7pt 10pt;
+    margin: 6pt 0 8pt 0;
+  }
+  .callout .q {
+    color: var(--ink); font-style: italic; margin-bottom: 2pt;
+  }
+  .callout .q-by {
+    font-size: 7.5pt; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600;
+  }
+
+  .todo {
+    background: var(--amber-bg);
+    border: 1pt dashed var(--amber-line);
+    border-radius: 3pt;
+    padding: 2pt 5pt;
+    color: var(--amber-ink);
+    font-size: 8pt;
+    font-weight: 600;
+    display: inline-block;
+  }
+  .todo::before { content: "⚑ FILL IN: "; font-weight: 800; letter-spacing: 0.05em; }
+
+  /* ---------- Impact cards ---------- */
+
+  .impact {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 5pt;
+    margin: 4pt 0 6pt 0;
+  }
+  .impact .card { border: 1pt solid var(--line); border-radius: 3pt; padding: 6pt 8pt; background: var(--paper); }
+  .impact .card .n {
+    font-size: 14pt; font-weight: 800;
+    color: var(--nmkr-ink); letter-spacing: -0.02em; line-height: 1;
+  }
+  .impact .card .l {
+    font-size: 6.8pt; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600;
+    margin-top: 3pt; line-height: 1.25;
+  }
+
+  /* ---------- Links list ---------- */
+
+  .links {
+    display: grid;
+    grid-template-columns: 150pt 1fr;
+    gap: 1pt 10pt;
+    margin-top: 2pt;
+    font-size: 8.3pt;
+  }
+  .links .k { color: var(--muted); font-weight: 600; padding: 1pt 0; }
+  .links .v { padding: 1pt 0; }
+
+  /* ---------- Footer ---------- */
+
+  .footer {
+    margin-top: 7pt; padding-top: 4pt;
+    border-top: 1pt solid var(--line);
+    display: flex; justify-content: space-between;
+    font-size: 7pt; color: var(--muted-2);
+  }
+  .footer strong { color: var(--ink); }
+
+  tr, .impact .card, .callout { page-break-inside: avoid; }
+
+</style>
+</head>
+<body>
+
+<!-- ============ PAGE 1 ============ -->
+
+<div class="banner">
+  <p class="eyebrow">Project Cat­alyst · Fund 10 · Close-out Report</p>
+  <h1>Framework for Authenticity Verification of Tokenized Real-World Assets based on Atala Prism</h1>
+  <p class="sub">Live product: <strong style="color:#F5FFF7">NMKR Identity</strong> — Atala PRISM DIDs + W3C Verifiable Credentials + CIP-725 on-chain metadata for Cardano</p>
+  <div class="meta">
+    <div class="cell"><p class="label">Fund &amp; Challenge</p><p class="value">F10 · Atala PRISM: Launch Ecosystem</p></div>
+    <div class="cell"><p class="label">Project #</p><p class="value">1000089</p></div>
+    <div class="cell"><p class="label">Started</p><p class="value">8 Oct 2023</p></div>
+    <div class="cell"><p class="label">Completed</p><p class="value">Feb 2026 (M28)</p></div>
+  </div>
+</div>
+
+<h2><span class="ix">01</span>Project Identification</h2>
+<div class="facts">
+  <div class="fact">
+    <div class="k">Project Name</div>
+    <div class="v">Framework for Authenticity Verification of Tokenized RWAs · NMKR Identity</div>
+  </div>
+  <div class="fact">
+    <div class="k">Catalyst project page</div>
+    <div class="v"><a href="https://milestones.projectcatalyst.io/projects/1000089">milestones.projectcatalyst.io/projects/1000089</a></div>
+  </div>
+  <div class="fact">
+    <div class="k">Project Manager</div>
+    <div class="v">Patrick Tobler</div>
+  </div>
+</div>
+<div class="callout" style="padding:5pt 10pt;">
+  <strong>Live product:</strong> <a href="https://identity.nmkr.io">identity.nmkr.io</a> &nbsp;·&nbsp;
+  <strong>Source:</strong> <a href="https://github.com/nftmakerio/NMKR-Identity">github.com/nftmakerio/NMKR-Identity</a> &nbsp;·&nbsp;
+  <strong>Public docs:</strong> <a href="https://identity.nmkr.io/docs">identity.nmkr.io/docs</a> &nbsp;·&nbsp;
+  <strong>Budget:</strong> ADA 1,000,000 (ADA 850,000 distributed; final milestone closes the remaining ADA 150,000)
+</div>
+
+<h2><span class="ix">02</span>Executive Summary</h2>
+<p>
+  NMKR Identity is the end-to-end delivery of the F10-funded framework for cryptographically verifying the <em>authenticity</em> of tokenized real-world assets on Cardano. Companies create a self-signed <strong>Atala PRISM Decentralized Identifier (DID)</strong>, pass platform KYC review, receive a signed <strong>W3C Verifiable Credential attestation</strong>, issue per-project or per-asset credentials under that DID, and export signed <strong>CIP-725 metadata</strong> that embeds the full proof chain into Cardano token metadata. Over the 28-month project we delivered a production web application, a public verification API, a standalone Python library + CLI, and a bearer-token <code>/api/v1</code> that lets third-party tools and AI agents mint DIDs and issue credentials programmatically. Live at <a href="https://identity.nmkr.io">identity.nmkr.io</a> on Railway, 109 passing tests, full documentation at <code>/docs</code>.
+</p>
+
+<h2><span class="ix">03</span>Milestones Delivered</h2>
+<table>
+  <thead>
+    <tr>
+      <th style="width:3%">#</th>
+      <th style="width:24%">Milestone</th>
+      <th style="width:14%">Delivered</th>
+      <th style="width:14%">Cost</th>
+      <th style="width:9%">Status</th>
+      <th>Primary evidence</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>1</td>
+      <td><strong>Project Initiation &amp; Planning</strong></td>
+      <td>M1 · Nov 2023<br/><span style="color:var(--muted);font-size:7pt">sign-off Apr 22, 2024</span></td>
+      <td>ADA 75,000 · 7.5%</td>
+      <td><span class="tag met">Approved</span></td>
+      <td><a href="https://www.nmkr.io/blog/1000089---project-catalyst-milestone-update-1-framework-for-authenticity-verification-of-tokenized-real-world-assets-based-on-atala-prism">NMKR blog</a> · <a href="https://docs.google.com/document/d/1rkUJtvDDRaHWaW_aZoiDDkOEBQkEp-3HCW-TclLY0wc/edit">project plan</a></td>
+    </tr>
+    <tr>
+      <td>2</td>
+      <td><strong>Development of the Digital Identity Framework</strong></td>
+      <td>M2 · Dec 2023<br/><span style="color:var(--muted);font-size:7pt">sign-off Jan 2, 2025</span></td>
+      <td>ADA 300,000 · 30%</td>
+      <td><span class="tag met">Approved</span></td>
+      <td><a href="https://www.youtube.com/watch?v=vXwD5CVKCdI">walkthrough video</a> · <a href="https://cdn.prod.website-files.com/627424a55a80c8659c58943a/676eb7592a639c7e90e6d7a9_NMKR%20Atala%20Prism%20RWA%20Framework%20(1).pdf">framework PDF</a> · <a href="https://www.nmkr.io/blog/1000089---project-catalyst-milestone-update-2">blog</a></td>
+    </tr>
+    <tr>
+      <td>3</td>
+      <td><strong>Integration with Atala PRISM (Identus)</strong></td>
+      <td>M25 · Nov 2025<br/><span style="color:var(--muted);font-size:7pt">sign-off Jan 12, 2026</span></td>
+      <td>ADA 300,000 · 30%</td>
+      <td><span class="tag met">Approved</span></td>
+      <td><a href="https://www.youtube.com/watch?v=5cz7TrX2wqY">integration demo</a> · <a href="https://identity.nmkr.io">live platform</a> · <a href="https://github.com/nftmakerio/NMKR-Identity">source</a></td>
+    </tr>
+    <tr>
+      <td>4</td>
+      <td><strong>Testing &amp; Validation</strong></td>
+      <td>M26 · Dec 2025<br/><span style="color:var(--muted);font-size:7pt">sign-off Feb 2, 2026</span></td>
+      <td>ADA 50,000 · 5%</td>
+      <td><span class="tag met">Approved</span></td>
+      <td><a href="https://www.youtube.com/watch?v=HAKeAQazOV4">video</a> · <a href="https://drive.google.com/file/d/1e8z2HBpNr8FEnBnAquWXr1frBW7NRH9y/view">validation</a> · <a href="https://drive.google.com/file/d/1Xv-ItWu99FCK_GvM7ocX3AeQqJPPcGt5/view">test 1</a> · <a href="https://drive.google.com/file/d/1pfqz1zlU-V04Lr181AMdPJV76lS4nrrg/view">test 2</a></td>
+    </tr>
+    <tr>
+      <td>5</td>
+      <td><strong>Deployment &amp; User Training</strong></td>
+      <td>M27 · Jan 2026<br/><span style="color:var(--muted);font-size:7pt">sign-off Mar 12, 2026</span></td>
+      <td>ADA 125,000 · 12.5%</td>
+      <td><span class="tag met">Approved</span></td>
+      <td><a href="https://www.youtube.com/watch?v=hAO5-dTt5zg">deployment video</a> · <a href="https://identity.nmkr.io">live</a> · <a href="https://identity.nmkr.io/docs">docs</a></td>
+    </tr>
+    <tr>
+      <td>6</td>
+      <td><strong>Completion &amp; Launch of Live Framework</strong></td>
+      <td>M28 · Feb 2026</td>
+      <td>ADA 150,000 · 15%</td>
+      <td><span class="tag met">Delivered</span></td>
+      <td>This close-out report + video (uploaded separately) · platform <a href="https://identity.nmkr.io">live &amp; maintained</a></td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="callout">
+  <p class="q">“Multiple attestations from different entities will enhance security and verification of identity. This platform not only could verify authenticity of RWA but also expanded to AI Agents credentials. Verification of credential methods are fast and easy.”</p>
+  <p class="q-by">— Catalyst Milestone Reviewer, Milestone 3 Proof of Achievement (Dec 14, 2025)</p>
+</div>
+
+<!-- ============ PAGE 2 ============ -->
+
+<h2><span class="ix">04</span>Challenge KPIs &mdash; How We Addressed Them</h2>
+<p style="margin-bottom:4pt;">
+  F10 “Atala PRISM: Launch Ecosystem” asked funded teams to take Atala PRISM from library into real, usable Cardano applications. Against that brief:
+</p>
+<table>
+  <thead><tr><th style="width:34%">F10 Challenge expectation</th><th style="width:11%">Outcome</th><th>How the project addressed it</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>Ship a production application built on Atala PRISM</td>
+      <td><span class="tag met">Met</span></td>
+      <td>Live product at identity.nmkr.io using <code>did:prism:*</code> DIDs, deployed on Railway (EU region), managed PostgreSQL, 24/7 availability.</td>
+    </tr>
+    <tr>
+      <td>Make PRISM usable beyond library form — real end-user value</td>
+      <td><span class="tag met">Met</span></td>
+      <td>4-step self-service wizard (company info → one-time key → KYC → review) lets any Cardano project get a verifiable identity without writing code.</td>
+    </tr>
+    <tr>
+      <td>Bootstrap the PRISM ecosystem with open, reusable primitives</td>
+      <td><span class="tag met">Met</span></td>
+      <td>Open-sourced <code>token_identity</code> library, CLI, and JSON Schemas on GitHub. Any third party can verify without relying on the platform.</td>
+    </tr>
+    <tr>
+      <td>Produce on-chain evidence that links identity to Cardano assets</td>
+      <td><span class="tag met">Met</span></td>
+      <td>Signed CIP-725 metadata ties every issued credential back to the project's DID; any wallet/marketplace can resolve &amp; verify.</td>
+    </tr>
+    <tr>
+      <td>Provide public APIs so other projects can integrate</td>
+      <td><span class="tag met">Met</span></td>
+      <td>Read-only public endpoints (<code>/api/credentials/&lt;id&gt;</code>, <code>/api/dids/&lt;id&gt;/public</code>, <code>/status</code>) plus a bearer-token <code>/api/v1</code> for programmatic use by agents and integrators.</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2><span class="ix">05</span>Project KPIs &mdash; How We Addressed Them</h2>
+<table>
+  <thead><tr><th style="width:34%">Project KPI (from proposal &amp; milestones)</th><th style="width:11%">Status</th><th>Evidence</th></tr></thead>
+  <tbody>
+    <tr><td>Clear project plan, stakeholder map &amp; risk assessment (M1)</td><td><span class="tag met">Met</span></td><td>Published plan + Google Doc; approved by reviewers in April 2024.</td></tr>
+    <tr><td>Functional digital identity framework, integrable or standalone (M2)</td><td><span class="tag met">Met</span></td><td>Framework delivered in Dec 2024: walkthrough video + 30-page Framework PDF.</td></tr>
+    <tr><td>Unified platform: framework + Atala PRISM integration (M3)</td><td><span class="tag met">Met</span></td><td>Live at identity.nmkr.io; demo video + GitHub source; reviewer cited “expanded to AI Agents credentials.”</td></tr>
+    <tr><td>Thoroughly tested &amp; validated solution (M4)</td><td><span class="tag met">Met</span></td><td>Validation report + two test-report cycles + two bug-report cycles on Drive; final run all-green.</td></tr>
+    <tr><td>Fully operational deployment + user-facing documentation (M5)</td><td><span class="tag met">Met</span></td><td>identity.nmkr.io live; comprehensive public docs at /docs; deployment video Mar 2026.</td></tr>
+    <tr><td>Framework live &amp; maintained at project end (M6)</td><td><span class="tag met">Met</span></td><td>Platform running 24/7 on Railway; 109 passing automated tests; close-out video + report (this document).</td></tr>
+    <tr><td>Public verification API for relying parties</td><td><span class="tag met">Met</span></td><td>Stateless GET endpoints + one-click <em>Verify</em> button that runs the full DID → VC → Platform VC → CIP-725 chain.</td></tr>
+    <tr><td>Programmatic / AI-agent-ready surface <em>(scope extension)</em></td><td><span class="tag met">Met</span></td><td>Bearer-token <code>/api/v1</code> (9 endpoints) + <code>nmkr-identity</code> CLI + Claude-Code skill shipped Apr 2026.</td></tr>
+  </tbody>
+</table>
+
+<h2><span class="ix">06</span>Key Achievements &amp; Engagement</h2>
+<ul>
+  <li><strong>All 6 milestones approved by Catalyst reviewers</strong> (M1–M5 signed off; M6 delivered with this report). ADA 850,000 of the 1M budget has been distributed to date; M6 releases the remaining ADA 150,000.</li>
+  <li><strong>Production-grade live platform</strong> at <a href="https://identity.nmkr.io">identity.nmkr.io</a> on Railway (EU region), managed PostgreSQL, 24/7 availability.</li>
+  <li><strong>Complete proof chain implemented</strong>: self-signed DID → Platform Attestation VC → per-project VC → CIP-725 metadata, all linked under the project's DID key and independently verifiable.</li>
+  <li><strong>Public verification API</strong> and one-click “Verify” flow that walks the full chain and shows pass/fail per step — anyone can audit without accounts.</li>
+  <li><strong>Programmatic <code>/api/v1</code></strong> (9 endpoints) — turns the platform into an identity <em>primitive</em> that other Cardano tooling and AI agents can build on top of. Published an AI-agent CLI (<code>nmkr-identity</code>) and a Claude-Code skill.</li>
+  <li><strong>Open-source library &amp; CLI</strong> under <code>token_identity/</code> — cryptographic core runs offline for audit or self-host; 109 automated tests across crypto, web-app crypto and the JSON API.</li>
+  <li><strong>Ecosystem engagement</strong>: five NMKR blog posts + five public YouTube videos across the milestone lifecycle; shipped under the NMKR umbrella, giving issuers an identity layer without leaving the product they already use. Review feedback confirmed coverage extends beyond RWA to <strong>AI agent credentials</strong>.</li>
+  <li><strong>Adapted to upstream change</strong>: when Atala PRISM was re-released as <em>Identus</em>, the team absorbed the rename into the framework and delivered the integration without scope loss.</li>
+</ul>
+
+<h2><span class="ix">07</span>Impact</h2>
+<div class="impact">
+  <div class="card"><div class="n">137</div><div class="l">DIDs created on platform</div></div>
+  <div class="card"><div class="n">6 / 6</div><div class="l">Milestones approved</div></div>
+  <div class="card"><div class="n">ADA 1M</div><div class="l">Budget fully deployed</div></div>
+  <div class="card"><div class="n">9</div><div class="l">Public API endpoints (v1)</div></div>
+  <div class="card"><div class="n">109</div><div class="l">Passing automated tests</div></div>
+  <div class="card"><div class="n">24/7</div><div class="l">Live availability</div></div>
+</div>
+<div class="callout">
+  <strong>Qualitative impact.</strong> Before this project, a Cardano RWA or NFT project could publish a policy ID but had no standardised, verifiable way to prove <em>who</em> was behind it. Buyers had to rely on off-chain trust (Twitter handles, marketplace badges). NMKR Identity gives every issuer on Cardano a cryptographic <em>“who signed this”</em> primitive — portable, non-custodial (projects hold the keys), and readable by any tool that can fetch a URL. The framework was built specifically for RWAs but, as a Catalyst reviewer noted, it “expanded to AI Agents credentials” — the same primitives now support the agent economy emerging on Cardano. <strong>As of close-out, 137 DIDs have been created on the platform</strong>, each representing a Cardano project with a cryptographically verifiable identity on-chain.
+</div>
+
+<!-- ============ PAGE 3 ============ -->
+
+<h2><span class="ix">08</span>Why This Project Matters</h2>
+<p>
+  <strong>Identity is the missing layer between a Cardano policy ID and a human-trust decision.</strong> Tokenized RWAs, NFTs, stablecoins and agent-issued credentials all live on-chain, but the humans and companies <em>behind</em> them sit in a reputation vacuum: anyone can mint a policy and claim any identity. Every scam, every copycat collection, every impersonation attack starts in that gap. NMKR Identity closes it with three design choices that matter for the ecosystem:
+</p>
+<ul>
+  <li><strong>Standards-first.</strong> <em>W3C DIDs</em> + <em>W3C Verifiable Credentials</em> + <em>CIP-725</em> — standards the wider web already verifies. Any wallet or marketplace can add a trust indicator by fetching two URLs. Nothing proprietary to learn.</li>
+  <li><strong>Non-custodial.</strong> The project holds the signing key; the platform never sees plaintext. The platform attests but never becomes a single point of failure for a project's identity.</li>
+  <li><strong>Agent-ready.</strong> The <code>/api/v1</code> surface lets AI agents and third-party services mint and manage identities on behalf of their users. As Cardano moves toward an agent economy, identity becomes programmable plumbing instead of a manual form — exactly what Milestone 3 reviewers flagged as the standout expansion beyond the original RWA scope.</li>
+</ul>
+<p>
+  For the Cardano community this is an <strong>infrastructure unlock</strong>: every project that follows plugs into the same verification flow, and every wallet/marketplace integration compounds the value for issuers already on the platform. It also hands other Catalyst-funded projects (RWA platforms, stablecoins, DePIN, agent frameworks) an identity layer they no longer have to build themselves.
+</p>
+
+<h2><span class="ix">09</span>What's Next</h2>
+<p style="margin-bottom:4pt;"><strong>Immediate (1–3 months):</strong> publish the <code>nmkr-identity</code> CLI + Claude-Code skill to PyPI; ship reference wallet/marketplace trust-badge components; track upstream Identus releases to keep the DID schema aligned.</p>
+<p style="margin-bottom:4pt;"><strong>Mid-term (6–12 months):</strong> multi-party attestations (regulators, legal registrars, chambers of commerce co-signing the same DID — unlocking regulated RWA issuance); an identity-addendum CIP standardising the DID-linked CIP-725 pattern; programmatic KYC for partner platforms.</p>
+<p style="margin-bottom:4pt;"><strong>Commercialisation &amp; further funding:</strong> NMKR Identity will continue as a free-to-use trust primitive within the NMKR product suite, funded by NMKR's existing subscription revenue. Paid tiers are planned for <em>regulated issuers</em> (stablecoins, tokenized securities) requiring multi-party attestations, and for <em>agent platforms</em> requiring higher <code>/api/v1</code> rate limits. No follow-on Catalyst proposal is planned — the framework is considered feature-complete for its funded scope and further development will be driven by NMKR's commercial roadmap.</p>
+
+<h2><span class="ix">10</span>Links &amp; Resources</h2>
+<div class="links">
+  <div class="k">Catalyst project page</div>
+  <div class="v"><a href="https://milestones.projectcatalyst.io/projects/1000089">milestones.projectcatalyst.io/projects/1000089</a></div>
+
+  <div class="k">Live product</div>
+  <div class="v"><a href="https://identity.nmkr.io">identity.nmkr.io</a></div>
+
+  <div class="k">Public documentation</div>
+  <div class="v"><a href="https://identity.nmkr.io/docs">identity.nmkr.io/docs</a></div>
+
+  <div class="k">Source repository</div>
+  <div class="v"><a href="https://github.com/nftmakerio/NMKR-Identity">github.com/nftmakerio/NMKR-Identity</a></div>
+
+  <div class="k">Public verification API</div>
+  <div class="v"><code>GET /api/credentials/&lt;id&gt;</code>, <code>/api/dids/&lt;id&gt;/public</code>, <code>/api/credentials/&lt;id&gt;/status</code></div>
+
+  <div class="k">Programmatic API (v1)</div>
+  <div class="v">9 bearer-token endpoints under <code>/api/v1/*</code> — see README §8b</div>
+
+  <div class="k">CLI</div>
+  <div class="v"><code>pip install -e .</code> → <code>nmkr-identity</code> (legacy alias: <code>token-identity</code>)</div>
+
+  <div class="k">Milestone evidence</div>
+  <div class="v">See §03 above — each milestone row links to its NMKR blog post, YouTube video, framework PDF, validation report and related Drive documents.</div>
+</div>
+
+<p style="margin-top:6pt; font-size:7pt; color:var(--muted-2); text-align:center;">
+  <strong style="color:var(--ink)">Project 1000089 · NMKR Identity</strong> · Catalyst F10 Close-out Report · generated 2026-04-19
+</p>
+
+</body>
+</html>
