@@ -19,6 +19,7 @@ from sqlalchemy import select
 
 from webapp.db import init_engine, make_session_factory, Base, session_scope
 from webapp.models import User, DidRecord, Attestation, Document, AuditLog, EmailToken, Credential
+from webapp import api_v1 as _api_v1
 from webapp.forms import RegisterForm, LoginForm, DIDCreateForm, ApproveForm, ForgotPasswordForm, ResetPasswordForm, UploadDocForm, CreateCredentialForm
 from webapp.crypto_utils import encrypt_with_passphrase, decrypt_with_passphrase
 from werkzeug.utils import secure_filename
@@ -1432,6 +1433,9 @@ def create_app() -> Flask:
                 return "Forbidden", 403
             atts = s.scalars(select(Attestation).where(Attestation.did_record_id == rec.id)).all()
         return render_template("wizard_review.html", rec=rec, attestations=atts)
+
+    # Programmatic JSON API v1 (bearer-token auth)
+    _api_v1.register(app, Session)
 
     return app
 
