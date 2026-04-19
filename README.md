@@ -105,20 +105,61 @@ docker-compose up --build
 
 ---
 
-## 8) CLI (Library Utilities)
+## 8) CLI
 
-- Generate DID:
-  ```bash
-  python -m token_identity.cli generate-did     --policy-id <policy> --collection <name>     [--asset <asset>] [--website url ...]     [--privkey-hex hex] [--out did.json]
-  ```
-- Generate 725 metadata:
-  ```bash
-  python -m token_identity.cli generate-metadata     --did did.json --policy-id <policy> --collection <name>     [--privkey-hex hex] [--out metadata.json]
-  ```
-- Verify (DID + 725):
-  ```bash
-  python -m token_identity.cli verify --did did.json --metadata metadata.json
-  ```
+Installed via `pip install -e .` (entry points: `nmkr-identity` preferred, `token-identity` legacy alias).
+
+### Local — offline artifact generation
+
+```bash
+nmkr-identity key new                                # generate a keypair
+nmkr-identity did create --collection "Acme" \
+  --website https://acme.test --out did.json         # create a DID Document
+nmkr-identity vc issue --did did.json --label "Genesis" \
+  --policy-id <hex> --privkey-hex $KEY --out vc.json
+nmkr-identity metadata generate --did did.json \
+  --policy-id <hex> --collection "Acme" \
+  --privkey-hex $KEY --out metadata.json
+nmkr-identity verify --did did.json --metadata metadata.json
+```
+
+Private keys resolve from `--privkey-hex`, `--privkey-file`, or the `NMKR_IDENTITY_PRIVKEY_HEX` env var. Legacy `generate-did` / `generate-metadata` commands still work.
+
+### Remote — talk to identity.nmkr.io
+
+```bash
+# one-time: mint a token at /settings and save it locally
+nmkr-identity remote login --token $TOKEN
+# or skip and export NMKR_IDENTITY_TOKEN (optionally NMKR_IDENTITY_URL)
+
+nmkr-identity remote whoami
+nmkr-identity remote did create --company "Acme GmbH" --website https://acme.test
+# ^ returns one-time privkey_hex + passphrase — save them!
+
+nmkr-identity remote did list
+nmkr-identity remote vc issue --did-id 42 --label Genesis \
+  --policy-id <hex> --privkey-hex $KEY
+nmkr-identity remote vc metadata 123 --privkey-hex $KEY --description "Genesis drop"
+nmkr-identity remote vc revoke 123 --reason "duplicate"
+```
+
+## 8b) Public JSON API (v1)
+
+Bearer-token authenticated, issued from `/settings/token` (hashed server-side).
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| GET    | `/api/v1/me` | Current user |
+| POST   | `/api/v1/dids` | Create DID (one-time `privkey_hex` + `passphrase` returned) |
+| GET    | `/api/v1/dids` | List caller's DIDs |
+| GET    | `/api/v1/dids/<id>` | DID + attestations + credentials |
+| POST   | `/api/v1/dids/<id>/credentials` | Issue a VC (needs signing key) |
+| GET    | `/api/v1/dids/<id>/credentials` | List VCs on a DID |
+| GET    | `/api/v1/credentials/<id>` | VC detail |
+| POST   | `/api/v1/credentials/<id>/revoke` | Revoke |
+| POST   | `/api/v1/credentials/<id>/metadata` | Signed CIP-725 metadata |
+
+Write endpoints that sign material accept either `{"privkey_hex": "..."}` (raw 32-byte hex) or `{"passphrase": "..."}` (server decrypts the stored encrypted key).
 
 ---
 
