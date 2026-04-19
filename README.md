@@ -2,6 +2,12 @@
 
 > Atala PRISM DIDs + Verifiable Credentials + Cardano 725 metadata — end‑to‑end, verifiable, and simple.
 
+**Ways to use it:**
+- **Web app** — [identity.nmkr.io](https://identity.nmkr.io) self-service wizard
+- **CLI** — `nmkr-identity` for local offline generation and remote platform calls ([§8](#8-cli))
+- **JSON API** — bearer-token `/api/v1/*` endpoints for programmatic integration ([§8b](#8b-public-json-api-v1))
+- **Claude Code skill** — [`skills/nmkr-identity/SKILL.md`](skills/nmkr-identity/SKILL.md) teaches an AI agent the full flow ([§8c](#8c-claude-code-skill))
+
 ---
 
 ## 1) What This Is
@@ -160,6 +166,24 @@ Bearer-token authenticated, issued from `/settings/token` (hashed server-side).
 | POST   | `/api/v1/credentials/<id>/metadata` | Signed CIP-725 metadata |
 
 Write endpoints that sign material accept either `{"privkey_hex": "..."}` (raw 32-byte hex) or `{"passphrase": "..."}` (server decrypts the stored encrypted key).
+
+## 8c) Claude Code Skill
+
+A drop-in [Claude Code](https://claude.com/claude-code) skill lives at [`skills/nmkr-identity/SKILL.md`](skills/nmkr-identity/SKILL.md). It teaches an AI agent the CLI surface, the `/api/v1` endpoints, and the common recipes (create DID → issue VC → generate CIP-725 metadata) as a single conversational flow.
+
+Install it into your Claude Code user directory:
+
+```bash
+# from the repo root
+mkdir -p ~/.claude/skills/nmkr-identity
+cp skills/nmkr-identity/SKILL.md ~/.claude/skills/nmkr-identity/
+# or symlink so updates track the repo
+ln -s "$PWD/skills/nmkr-identity" ~/.claude/skills/nmkr-identity
+```
+
+The skill auto-triggers when you mention phrases like *"create DID"*, *"NMKR identity"*, *"Verifiable Credential"*, *"CIP-725 metadata"*, *"sign VC"*, or *"PRISM DID"* in Claude Code. It documents key-handling rules (never echo `privkey_hex` / `passphrase` to chat, prefer `--privkey-file` over flags in scripts), common failure modes, and both local and remote command recipes.
+
+Agents that aren't on Claude Code can still use the CLI directly — `nmkr-identity` takes the same inputs the skill describes.
 
 ---
 
