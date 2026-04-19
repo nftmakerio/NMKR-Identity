@@ -459,9 +459,31 @@ def create_app() -> Flask:
             flash(f"DID validation failed: {e}", "error")
             return redirect(url_for("dashboard"))
 
+        user_id = int(current_user.get_id())
+        # Pre-check: DID suffix = sha256(company) is deterministic, so identical
+        # company names always collide. Handle same-owner vs cross-owner cleanly
+        # instead of surfacing a Postgres UniqueViolation as a 500.
+        with session_scope(Session) as s:
+            existing = s.scalar(select(DidRecord).where(DidRecord.did_id == did))
+            if existing:
+                if existing.user_id == user_id:
+                    flash(
+                        f"A DID for \"{company}\" already exists on your account — "
+                        f"continuing with the existing one.",
+                        "info",
+                    )
+                    return redirect(url_for("did_detail", did_id=existing.id))
+                flash(
+                    f"A DID for the company name \"{company}\" already exists on the "
+                    f"platform (owned by another account). Please use a more specific "
+                    f"company name (e.g. include legal suffix or location).",
+                    "error",
+                )
+                return redirect(url_for("dashboard"))
+
         with session_scope(Session) as s:
             rec = DidRecord(
-                user_id=int(current_user.get_id()),
+                user_id=user_id,
                 company=company,
                 website=website,
                 twitter=twitter,
@@ -475,7 +497,7 @@ def create_app() -> Flask:
                 kyc_status="draft",
             )
             s.add(rec)
-            s.add(AuditLog(user_id=int(current_user.get_id()), action="create_did", target=did, message=f"Company {company}"))
+            s.add(AuditLog(user_id=user_id, action="create_did", target=did, message=f"Company {company}"))
         # Redirect into wizard step 2 (Save Key)
         with session_scope(Session) as s:
             rec = s.scalar(select(DidRecord).where(DidRecord.did_id == did))

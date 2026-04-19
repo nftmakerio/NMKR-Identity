@@ -182,6 +182,24 @@ def register(app: Flask, Session) -> None:  # noqa: N803 (Session is a sessionma
         discord_str = " ".join(dc) if dc else ""
         website_str = " ".join(websites)
 
+        # DID suffix is deterministic (sha256 of company name), so duplicates
+        # need to be handled cleanly instead of leaking a 500.
+        with session_scope(Session) as s:
+            existing = s.scalar(select(DidRecord).where(DidRecord.did_id == did_doc["id"]))
+            if existing:
+                if existing.user_id == g.api_user["id"]:
+                    return _error(
+                        f"a DID for '{company}' already exists on your account",
+                        status=409,
+                        did_id=existing.id,
+                        did=existing.did_id,
+                    )
+                return _error(
+                    f"a DID for company name '{company}' already exists on the platform (owned by another account); "
+                    f"use a more specific name (add legal suffix or location)",
+                    status=409,
+                )
+
         with session_scope(Session) as s:
             rec = DidRecord(
                 user_id=g.api_user["id"],
