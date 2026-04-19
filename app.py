@@ -1082,18 +1082,29 @@ def create_app() -> Flask:
                 return "Not found", 404
             if int(current_user.get_id()) != rec.user_id and not current_user.is_admin:
                 return "Forbidden", 403
-        files = request.files.getlist("files") or []
+        # Collect FileStorage objects from both the new "files" (multi) and legacy "file" (single)
+        raw = list(request.files.getlist("files") or [])
+        legacy = request.files.get("file")
+        if legacy:
+            raw.append(legacy)
+        # Drop the empty FileStorage entries browsers add for a form submitted without a selection
+        files = [f for f in raw if getattr(f, "filename", "")]
+        app.logger.info(
+            "upload: did_id=%s user=%s raw=%d real=%d names=%s",
+            did_id, current_user.get_id(), len(raw), len(files),
+            [f.filename for f in files],
+        )
         if not files:
-            # Fallback for single legacy name
-            single = request.files.get("file")
-            if single and single.filename:
-                files = [single]
-        if not files:
-            flash("No file selected", "error")
-            return redirect(url_for("did_detail", did_id=did_id))
+            flash("No file selected — click the drop zone to pick a file before pressing Upload.", "error")
+            return redirect(request.form.get("next") or url_for("did_detail", did_id=did_id))
         saved = 0
         allowed = app.config["ALLOWED_EXTENSIONS"]
-        os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
+        try:
+            os.makedirs(app.config["UPLOAD_FOLDER"], exist_ok=True)
+        except OSError as e:
+            app.logger.exception("upload: cannot create upload folder %s", app.config["UPLOAD_FOLDER"])
+            flash(f"Server storage error: {e}. Please contact support.", "error")
+            return redirect(url_for("did_detail", did_id=did_id))
         import uuid
         for file in files:
             fname = secure_filename(file.filename)
@@ -1105,19 +1116,28 @@ def create_app() -> Flask:
                 continue
             unique = f"{uuid.uuid4().hex}_{fname}"
             path = os.path.join(app.config["UPLOAD_FOLDER"], unique)
-            file.save(path)
-            with session_scope(Session) as s:
-                s.add(Document(did_record_id=did_id, filename=fname, stored_path=path))
-                s.add(AuditLog(user_id=int(current_user.get_id()), action="upload_doc", target=str(did_id), message=fname))
-            saved += 1
+            try:
+                file.save(path)
+                with session_scope(Session) as s:
+                    s.add(Document(did_record_id=did_id, filename=fname, stored_path=path))
+                    s.add(AuditLog(user_id=int(current_user.get_id()), action="upload_doc", target=str(did_id), message=fname))
+                saved += 1
+            except Exception as e:
+                app.logger.exception("upload: failed to save %s", fname)
+                flash(f"Could not save {fname}: {e}", "error")
         if saved:
             flash(f"Uploaded {saved} file(s)", "info")
-        else:
+        elif not get_flashed_messages_present():
+            # Only show generic failure if no specific error flash already queued
             flash("No files were uploaded.", "error")
         next_url = request.args.get("next") or request.form.get("next")
         if next_url:
             return redirect(next_url)
         return redirect(url_for("did_detail", did_id=did_id))
+
+    def get_flashed_messages_present() -> bool:
+        # Check the pending flash bucket without consuming it.
+        return bool(session.get("_flashes"))
 
     @app.get("/api/dids/<int:did_id>")
     @login_required

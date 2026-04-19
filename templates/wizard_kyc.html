@@ -41,14 +41,17 @@
     </ul>
   </div>
 
-  <form method="post" action="{{ upload_action }}" enctype="multipart/form-data">
+  <form method="post" action="{{ upload_action }}" enctype="multipart/form-data" id="upload-form">
     <div class="dropzone" id="dropzone">
-      Drag & drop files here, or click to select
+      <div id="dropzone-prompt">Drag &amp; drop files here, or click to select</div>
+      <ul id="dropzone-list" class="doc-list" style="display:none; text-align:left; margin-top:8px;"></ul>
       <input type="file" id="files" name="files" accept=".pdf,.png,.jpg,.jpeg,.webp" multiple style="display:none;">
     </div>
     <div class="hint">Allowed: PDF, PNG, JPG, WEBP. Max {{ (config.MAX_CONTENT_LENGTH // (1024*1024)) if config.MAX_CONTENT_LENGTH else 25 }} MB each.</div>
     <input type="hidden" name="next" value="{{ request.path }}">
-    <div class="actions"><button type="submit">Upload</button></div>
+    <div class="actions">
+      <button type="submit" id="upload-btn" disabled>Upload</button>
+    </div>
   </form>
 
   <h3>Uploaded Documents</h3>
@@ -72,11 +75,53 @@
 </div>
 
 <script>
-  const dz = document.getElementById('dropzone');
-  const input = document.getElementById('files');
-  dz.addEventListener('click', () => input.click());
-  dz.addEventListener('dragover', (e) => { e.preventDefault(); dz.classList.add('active'); });
-  dz.addEventListener('dragleave', () => { dz.classList.remove('active'); });
-  dz.addEventListener('drop', (e) => { e.preventDefault(); dz.classList.remove('active'); input.files = e.dataTransfer.files; });
+  (function() {
+    const dz     = document.getElementById('dropzone');
+    const input  = document.getElementById('files');
+    const prompt = document.getElementById('dropzone-prompt');
+    const list   = document.getElementById('dropzone-list');
+    const btn    = document.getElementById('upload-btn');
+
+    function render() {
+      const files = Array.from(input.files || []);
+      if (!files.length) {
+        list.style.display = 'none';
+        list.innerHTML = '';
+        prompt.style.display = '';
+        btn.disabled = true;
+        return;
+      }
+      prompt.style.display = 'none';
+      list.style.display = '';
+      list.innerHTML = files
+        .map(f => `<li class="doc-item"><span class="doc-dot"></span>${f.name} <span style="color:var(--text-muted); margin-left:auto;">${(f.size/1024/1024).toFixed(2)} MB</span></li>`)
+        .join('');
+      btn.disabled = false;
+    }
+
+    dz.addEventListener('click', (e) => {
+      if (e.target === input) return;
+      input.click();
+    });
+    input.addEventListener('change', render);
+
+    dz.addEventListener('dragover',  (e) => { e.preventDefault(); dz.classList.add('active'); });
+    dz.addEventListener('dragleave', ()  => { dz.classList.remove('active'); });
+    dz.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dz.classList.remove('active');
+      const dt = e.dataTransfer;
+      if (dt && dt.files && dt.files.length) {
+        // DataTransfer -> FileList copy (works in modern browsers including Safari 14+)
+        try { input.files = dt.files; } catch (err) {
+          // Fallback: use a DataTransfer proxy
+          const tx = new DataTransfer();
+          for (const f of dt.files) tx.items.add(f);
+          input.files = tx.files;
+        }
+        render();
+      }
+    });
+  })();
 </script>
 {% endblock %}

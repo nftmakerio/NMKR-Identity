@@ -21,5 +21,5 @@ ENV FLASK_ENV=production \
 
 EXPOSE 8000
 
-CMD ["gunicorn", "-b", "0.0.0.0:8000", "app:create_app()"]
+CMD ["gunicorn", "-b", "0.0.0.0:8000", "--access-logfile", "-", "--error-logfile", "-", "--capture-output", "app:create_app()"]
 
